@@ -11,6 +11,7 @@
 | D1 | Tên sản phẩm | **DropLab** (Swift package `DropLabCore`, CLI `droplab`) |
 | D2 | Phân phối | **Developer ID + Notarization**, không sandbox (Mac App Store để sau) |
 | D3 | Codec bên thứ ba | **Đồng ý** đóng gói LAME, libwebp, libopus/libvorbis, ffmpeg (bản LGPL, link động), kèm license trong About |
+| D4 | Nền tảng ưu tiên | **macOS là chính**, iPhone/iPad là phụ. Mọi milestone đến 1.0 chỉ phục vụ macOS; iOS là companion sau 1.0 và có thể bị cắt/hoãn nếu ảnh hưởng chất lượng bản Mac |
 
 ---
 
@@ -93,7 +94,8 @@ Mục tiêu: trả lời "làm được không" trước khi viết code thật.
 - [ ] Notarization, DMG, auto-update (Sparkle), crash report.
 - [ ] Onboarding xin quyền (nếu cần), landing page + GIF demo.
 
-### M6 — iOS / iPadOS Companion (sau 1.0)
+### M6 — iOS / iPadOS Companion (phụ, sau 1.0 — tuỳ chọn)
+> Chỉ bắt đầu khi bản macOS 1.0 đã ổn định. Tái sử dụng `DropLabCore`; phạm vi tối thiểu.
 - [ ] **Share/Action Extension**: "Convert with DropLab" từ Files/Photos.
 - [ ] **App Intents** để dùng trong Shortcuts.
 - [ ] Drop zone + Radial Orbit **trong app** (đặc biệt hữu ích trên iPad Split View).

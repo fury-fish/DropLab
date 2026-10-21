@@ -1,10 +1,11 @@
 <div align="center">
 
 # 🧪 DropLab
-**Next-Gen Context-Aware File Converter & Quick Processor for macOS & iOS**  
-*Công cụ chuyển đổi và xử lý file siêu tốc với trải nghiệm tương tác vật lý dành riêng cho hệ sinh thái Apple*
+**Next-Gen Context-Aware File Converter & Quick Processor for macOS** *(iPhone/iPad companion later)*  
+*Công cụ chuyển đổi và xử lý file siêu tốc cho macOS — bản iPhone/iPad là phụ, làm sau*
 
-[![Platform](https://img.shields.io/badge/Platform-macOS%2014%2B%20%7C%20iOS%2017%2B-000000?style=flat-square&logo=apple)](https://apple.com)
+[![Platform](https://img.shields.io/badge/Platform-macOS%2014%2B-000000?style=flat-square&logo=apple)](https://apple.com)
+[![Companion](https://img.shields.io/badge/Companion-iOS%2017%2B%20%28later%29-8E8E93?style=flat-square&logo=apple)](ROADMAP.md)
 [![Swift](https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white)](https://swift.org)
 [![SwiftUI](https://img.shields.io/badge/UI-SwiftUI%20%26%20AppKit-007AFF?style=flat-square&logo=swift)](https://developer.apple.com/xcode/swiftui/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
@@ -30,7 +31,7 @@ afconvert -f WAVE -d LEI16 input.mp3 match.wav
 ffmpeg -i magic-potion.wav -ss 00:00:00 -to 00:00:08 -c copy magic-potion-1.wav
 ```
 
-**DropLab** reimagines file conversion as an effortless, zero-window spatial gesture on **macOS** and **iOS**.
+**DropLab** reimagines file conversion as an effortless, zero-window spatial gesture on **macOS** — with a lightweight iPhone/iPad companion planned after 1.0.
 
 ---
 
@@ -63,7 +64,7 @@ Turn your device's hardware cutout into a tactile, fluid processing dock.
   * **Inline Waveform Trimmer:** Need a quick cut? Adjust the yellow handles right inside the expanded Notch to trim the exact segment (e.g., `00:00 - 00:08`) with live audio preview before exporting.
   * **No notch?** On Macs without a notch or on external displays, a hidden pill at the top-center of the screen acts as the drop zone.
 
-* **On iOS / iPadOS (Companion):**
+* **On iOS / iPadOS (Secondary companion, after macOS 1.0):**
   * iOS does not allow third-party apps to accept drops on the Dynamic Island or to draw over other apps. *(iOS không cho phép thả file vào Dynamic Island hay vẽ đè lên app khác.)*
   * **Share / Action Extension:** Select `image.heic` in Files or Photos ➔ Share ➔ **Convert with DropLab** ➔ swipe through a format carousel (`PNG`, `WEBP`, `JPG`).
   * **In-app Drop Zone & Shortcuts:** Drop files into the app (great with iPad Split View) or automate with App Intents.
@@ -112,7 +113,7 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 * [ ] **M3 (Radial Orbit):** Drag & hold pie menu with sub-orbit presets, global hotkey alternative
 * [ ] **M4 (Extended Codecs + Trim UI):** `MP3`/`WEBP`/`OGG`/`WEBM` encoders, waveform trimmer, video basics
 * [ ] **M5 (Release 1.0 macOS):** Notarized DMG, Sparkle auto-update, onboarding
-* [ ] **M6 (iOS/iPadOS Companion):** Share/Action Extension, App Intents, in-app drop zone, Live Activity progress
+* [ ] **M6 (iOS/iPadOS Companion — secondary, optional):** Share/Action Extension, App Intents, in-app drop zone, Live Activity progress
 
 ---
 
