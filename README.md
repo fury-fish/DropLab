@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌀 OrbitDrop (NotchAlchemy)
+# 🧪 DropLab
 **Next-Gen Context-Aware File Converter & Quick Processor for macOS & iOS**  
 *Công cụ chuyển đổi và xử lý file siêu tốc với trải nghiệm tương tác vật lý dành riêng cho hệ sinh thái Apple*
 
@@ -12,7 +12,7 @@
 <br/>
 <br/>
 
-<img src="assets/concept-preview.png" alt="OrbitDrop Core Concepts" width="100%" />
+<img src="assets/concept-preview.png" alt="DropLab Core Concepts" width="100%" />
 
 </div>
 
@@ -30,7 +30,7 @@ afconvert -f WAVE -d LEI16 input.mp3 match.wav
 ffmpeg -i magic-potion.wav -ss 00:00:00 -to 00:00:08 -c copy magic-potion-1.wav
 ```
 
-**OrbitDrop** reimagines file conversion as an effortless, zero-window spatial gesture on **macOS** and **iOS**.
+**DropLab** reimagines file conversion as an effortless, zero-window spatial gesture on **macOS** and **iOS**.
 
 ---
 
@@ -65,7 +65,7 @@ Turn your device's hardware cutout into a tactile, fluid processing dock.
 
 * **On iOS / iPadOS (Companion):**
   * iOS does not allow third-party apps to accept drops on the Dynamic Island or to draw over other apps. *(iOS không cho phép thả file vào Dynamic Island hay vẽ đè lên app khác.)*
-  * **Share / Action Extension:** Select `image.heic` in Files or Photos ➔ Share ➔ **Convert with OrbitDrop** ➔ swipe through a format carousel (`PNG`, `WEBP`, `JPG`).
+  * **Share / Action Extension:** Select `image.heic` in Files or Photos ➔ Share ➔ **Convert with DropLab** ➔ swipe through a format carousel (`PNG`, `WEBP`, `JPG`).
   * **In-app Drop Zone & Shortcuts:** Drop files into the app (great with iPad Split View) or automate with App Intents.
   * **Dynamic Island:** Shows live conversion progress via a Live Activity.
 
@@ -103,11 +103,11 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 
 ## 🗺️ Roadmap / Lộ trình Phát triển
 
-> Full plan with review notes & Definition of Done: **[ROADMAP.md](ROADMAP.md)**
+> ✅ Plan locked (2026-10-21). Full plan with decisions, review notes & Definition of Done: **[ROADMAP.md](ROADMAP.md)**
 
 * [x] UX/UI Concept & Conversion Matrix Architecture
 * [ ] **Phase 0 (Spikes):** Validate global drag detection, notch `NSPanel` drop target, native audio/image conversion, non-sandboxed output
-* [ ] **M1 (Engine + CLI):** `OrbitDropCore` Swift package + `orbitdrop` CLI — native audio (`LEI16`, `24-bit`, `Trim`) & image (`HEIC`, `PNG`, `JPG`, `ICNS`)
+* [ ] **M1 (Engine + CLI):** `DropLabCore` Swift package + `droplab` CLI — native audio (`LEI16`, `24-bit`, `Trim`) & image (`HEIC`, `PNG`, `JPG`, `ICNS`)
 * [ ] **M2 (Notch Tray MVP):** Menu bar app, drop into notch (top-center pill fallback) ➔ pick format ➔ export, batch + Undo
 * [ ] **M3 (Radial Orbit):** Drag & hold pie menu with sub-orbit presets, global hotkey alternative
 * [ ] **M4 (Extended Codecs + Trim UI):** `MP3`/`WEBP`/`OGG`/`WEBM` encoders, waveform trimmer, video basics
@@ -118,6 +118,6 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 
 ## 🤝 Feedback & Contributions / Đóng góp Ý kiến
 
-This project is currently in the **Concept & Active Prototyping** stage.
+This project is in the **Plan Locked** stage — roadmap finalized, implementation starts with Phase 0.
 
 Which interaction style do you prefer: **Radial Orbit (Concept 1)** or **Notch Alchemy (Concept 2)**? Feel free to open an [Issue](https://github.com/fury-fish/DropLab/issues) or join the discussion!

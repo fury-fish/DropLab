@@ -1,7 +1,16 @@
-# 🗺️ OrbitDrop — Revised Roadmap / Lộ trình đã rà soát
+# 🗺️ DropLab — Roadmap (Locked) / Lộ trình đã chốt
 
+> **Trạng thái:** ✅ Đã chốt plan — 2026-10-21. Chưa bắt đầu code; bước tiếp theo là **Phase 0**.
 > Bản này thay cho roadmap 4 milestone ban đầu trong `README.md`.
 > Mục tiêu: **ra được MVP macOS dùng thật sớm nhất**, xử lý các rủi ro kỹ thuật lớn trước khi làm UI đẹp.
+
+## 0. Quyết định đã chốt / Decisions
+
+| # | Hạng mục | Quyết định |
+|---|---|---|
+| D1 | Tên sản phẩm | **DropLab** (Swift package `DropLabCore`, CLI `droplab`) |
+| D2 | Phân phối | **Developer ID + Notarization**, không sandbox (Mac App Store để sau) |
+| D3 | Codec bên thứ ba | **Đồng ý** đóng gói LAME, libwebp, libopus/libvorbis, ffmpeg (bản LGPL, link động), kèm license trong About |
 
 ---
 
@@ -13,14 +22,14 @@
 | 2 | **iOS: Radial Orbit "kéo & giữ" khi đang ở app khác** | 🔴 Không khả thi | Không có global gesture/overlay trên iOS. | Radial Orbit trên iOS chỉ hoạt động **trong app** (iPad: drag từ Files ở Split View vào app). |
 | 3 | **"100% native"** cho MP3/OGG/WebP/WebM/MKV/AVIF/EPS | 🔴 Sai | AVFoundation/AudioToolbox **không encode MP3**, không hỗ trợ OGG/Vorbis, WebM, MKV. ImageIO **đọc** được WebP nhưng **không ghi**. macOS mới đã bỏ render EPS/PostScript. | Chia 2 tầng: **Native core** (mặc định) + **Extended codecs** (`libwebp`, `LAME`, `libvorbis/opus`, hoặc `ffmpeg` LGPL, link động). Ghi rõ trong ma trận định dạng. |
 | 4 | **Thả vào Notch rồi cuộn Trackpad 2 ngón để chọn định dạng** | 🟠 Khó dùng | Đang giữ click để kéo + cuộn 2 ngón cùng lúc gần như không làm được trên trackpad. | **Thả trước → tray giữ file → chọn bằng scroll / click / phím mũi tên → Enter**. |
-| 5 | **Xuất file "ngay cạnh file gốc"** | 🟠 Rủi ro phân phối | App Sandbox (Mac App Store) chỉ cấp quyền cho file được thả, **không cấp quyền ghi vào thư mục cha**. | Giai đoạn đầu phân phối **Developer ID + Notarization** (không sandbox). Nếu lên App Store sau: xin quyền thư mục 1 lần + security-scoped bookmark, fallback `~/Downloads/OrbitDrop`. |
+| 5 | **Xuất file "ngay cạnh file gốc"** | 🟠 Rủi ro phân phối | App Sandbox (Mac App Store) chỉ cấp quyền cho file được thả, **không cấp quyền ghi vào thư mục cha**. | Giai đoạn đầu phân phối **Developer ID + Notarization** (không sandbox). Nếu lên App Store sau: xin quyền thư mục 1 lần + security-scoped bookmark, fallback `~/Downloads/DropLab`. |
 | 6 | **Làm cả 2 concept song song ngay từ M1–M2** | 🟠 Scope quá lớn | Hai cơ chế overlay khác nhau, nhân đôi chi phí UI/QA trước khi có converter chạy được. | MVP chỉ làm **Notch Tray** (drop target cố định, dễ nhất). Radial Orbit ở milestone sau. |
 | 7 | **Notch chỉ có trên MacBook có tai thỏ** | 🟡 Thiếu | Mac mini/Studio, màn hình ngoài, MacBook Air Intel không có notch. | Fallback: **viên thuốc ẩn ở top-center** của màn hình đang chứa con trỏ. |
 | 8 | **Phát hiện "global drag + hold 0.4s"** chưa được kiểm chứng | 🟡 Rủi ro | Cần theo dõi `NSPasteboard(name: .drag)` + global mouse monitor, phải không cản trở drag gốc và không gây giật. | Đưa vào **Phase 0 spike** trước khi cam kết UX Radial. |
 | 9 | **Converter đặt ở M3, sau UI** | 🟡 Thứ tự sai | UI không có engine phía sau thì không demo/test được. | Làm **Conversion Engine + CLI** trước, UI gọi vào engine. |
 | 10 | **Ma trận định dạng quá rộng** (EPUB, DOCX↔PDF, SVG→SwiftUI Shape, Whisper) | 🟡 Scope creep | Mỗi mục là một dự án con. | Chuyển sang **Backlog / Later**. |
 | 11 | Thiếu phần **kiểm thử, hiệu năng, phân phối** | 🟡 Thiếu | Không có tiêu chí "Done". | Thêm Definition of Done cho mỗi milestone. |
-| 12 | Tên không thống nhất: repo `DropLab` vs README `OrbitDrop (NotchAlchemy)` | 🟡 | Gây nhầm khi tạo bundle id, landing page. | Cần chốt 1 tên trước M1. |
+| 12 | Tên không thống nhất: repo `DropLab` vs README `OrbitDrop (NotchAlchemy)` | 🟡 | Gây nhầm khi tạo bundle id, landing page. | ✅ Đã chốt tên **DropLab**. |
 
 ---
 
@@ -46,12 +55,12 @@ Mục tiêu: trả lời "làm được không" trước khi viết code thật.
 **Done khi:** có báo cáo ngắn từng spike (OK / không OK / workaround).
 
 ### M1 — Conversion Engine + CLI (≈ 2 tuần)
-- [ ] Swift Package `OrbitDropCore`: `Converter` protocol, registry theo `UTType` → danh sách đích hợp lệ.
+- [ ] Swift Package `DropLabCore`: `Converter` protocol, registry theo `UTType` → danh sách đích hợp lệ.
 - [ ] Converter native:
   - Audio: `wav`, `aiff`, `caf`, `m4a (AAC/ALAC)` + preset `LEI16`, `24-bit`, `Mono`, `Trim`.
   - Image: `heic`, `png`, `jpg`, `tiff`, `gif` + `Scale`, `Quality`, `Remove Alpha`; `png → icns`.
   - Data: `json ⟷ plist`, `minify/prettify`.
-- [ ] CLI `orbitdrop convert in.mp3 --to wav --preset lei16` (thay thế trực tiếp `afconvert`/`ffmpeg` trong workflow hiện tại).
+- [ ] CLI `droplab convert in.mp3 --to wav --preset lei16` (thay thế trực tiếp `afconvert`/`ffmpeg` trong workflow hiện tại).
 - [ ] Đặt tên file đầu ra an toàn (không ghi đè: `match_LEI16.wav`, `match_LEI16 2.wav`).
 
 **Done khi:** unit test cho mỗi cặp định dạng với file mẫu; convert ảnh 12MP < 300 ms, audio 3 phút < 1 s trên M1.
@@ -85,7 +94,7 @@ Mục tiêu: trả lời "làm được không" trước khi viết code thật.
 - [ ] Onboarding xin quyền (nếu cần), landing page + GIF demo.
 
 ### M6 — iOS / iPadOS Companion (sau 1.0)
-- [ ] **Share/Action Extension**: "Convert with OrbitDrop" từ Files/Photos.
+- [ ] **Share/Action Extension**: "Convert with DropLab" từ Files/Photos.
 - [ ] **App Intents** để dùng trong Shortcuts.
 - [ ] Drop zone + Radial Orbit **trong app** (đặc biệt hữu ích trên iPad Split View).
 - [ ] Live Activity / Dynamic Island hiển thị **tiến trình** convert (không nhận drop).
@@ -95,12 +104,11 @@ Mục tiêu: trả lời "làm được không" trước khi viết code thật.
 ## 3. Backlog / Later
 - Speech-to-text `audio → txt/srt` (Speech framework hoặc whisper.cpp).
 - OCR `image → txt` (Vision).
-- `md ⟷ html ⟷ pdf`, DOCX, EPUB, merge/split/compress PDF.
+- `md ⟷ html ⟷ pdf`, DOCX, EPUB, compress PDF.
 - SVG → raster / SVG → SwiftUI `Shape`.
 - Sprite sheet, `.appiconset` generator.
 - Finder Quick Action / Services menu.
+- Mac App Store build (sandbox + security-scoped bookmarks, fallback `~/Downloads/DropLab`).
 
-## 4. Câu hỏi cần chốt
-1. Tên chính thức: `DropLab`, `OrbitDrop` hay `NotchAlchemy`?
-2. Phân phối: Developer ID (khuyến nghị cho MVP) hay Mac App Store ngay từ đầu?
-3. Có chấp nhận đóng gói thư viện bên thứ ba (LAME, libwebp, ffmpeg-LGPL) không?
+## 4. Bước tiếp theo
+- Bắt đầu **Phase 0 — Technical Spikes** khi có lệnh code. Mọi quyết định ở mục 0 đã chốt, không còn câu hỏi mở.
