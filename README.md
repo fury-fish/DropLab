@@ -40,66 +40,79 @@ Users can freely choose to enable **Concept 1**, **Concept 2**, or **both simult
 
 *(Người dùng có thể tuỳ ý bật 1 trong 2 hoặc kết hợp cả 2 chế độ thao tác dưới đây)*
 
-### 1. 🪐 Concept 1: Radial Orbit — Vòng Xoay Trọng Lực (macOS & iOS)
+### 1. 🪐 Concept 1: Radial Orbit — Vòng Xoay Trọng Lực (macOS; in-app on iPad)
 
 Convert files right where your cursor or finger is, without moving across the screen.  
 *(Kéo và giữ nhẹ để chuyển đổi ngay tại chỗ)*
 
-1. **Drag & Hold (Kéo & Giữ File):** Grab any file (e.g., `match.mp3`) and hold still for `0.4s` (or tap with a second finger on iOS).
+1. **Drag & Hold (Kéo & Giữ File):** Grab any file (e.g., `match.mp3`) and hold still for `0.4s`. Alternative: select files in Finder and press a global hotkey.
 2. **Context-Aware Pie Menu (Rê vào định dạng mong muốn):** A smart radial menu blooms right under your pointer, dynamically filtering only compatible target formats (`WAV`, `CAF`, `M4A`, `OGG`, `TXT`).
 3. **Sub-Orbit Modifiers (Tuỳ chọn chuyên sâu):** Hovering over a primary slice like `WAV ->` expands an outer ring for instant technical presets: `LEI16`, `24-bit`, or `Cắt (Trim)`.
 4. **Release to Convert (Thả tay để chuyển đổi):** Let go of the mouse/finger on your chosen slice, and `match_LEI16.wav` is generated instantly right next to the original file.
 
 ---
 
-### 2. 🖤 Concept 2: Notch & Dynamic Island Alchemy — Lò Luyện Tai Thỏ (macOS & iOS)
+### 2. 🖤 Concept 2: Notch Alchemy — Lò Luyện Tai Thỏ (macOS) + iOS Companion
 
 Turn your device's hardware cutout into a tactile, fluid processing dock.  
 *(Thả vào phần cứng để kích hoạt xử lý nhanh)*
 
 * **On macOS (Notch Tray):**
-  * **Drop into the Notch:** Drag `zapsplat_music.mp3` straight up into the MacBook Notch. The Notch morphs smoothly like liquid into a dark control tray.
-  * **Trackpad Dial:** Scroll with two fingers on your Trackpad to cycle through target formats (`MP4 ➔ WAV ➔ M4A`).
+  * **Drop into the Notch:** Drag `zapsplat_music.mp3` straight up into the MacBook Notch. The Notch morphs smoothly like liquid into a dark control tray that holds the file.
+  * **Pick a Format:** After dropping, scroll with two fingers on your Trackpad (or use `←` `→` / click) to cycle through target formats (`MP4 ➔ WAV ➔ M4A`), then press `Enter`.
   * **Inline Waveform Trimmer:** Need a quick cut? Adjust the yellow handles right inside the expanded Notch to trim the exact segment (e.g., `00:00 - 00:08`) with live audio preview before exporting.
+  * **No notch?** On Macs without a notch or on external displays, a hidden pill at the top-center of the screen acts as the drop zone.
 
-* **On iOS (Dynamic Island):**
-  * **Drag to Top:** Drag an image (`image.heic`) from Files or Photos toward the Dynamic Island.
-  * **Swipe & Drop:** The Island expands into a format carousel (`PNG`, `WEBP`, `JPG`). Swipe horizontally with your thumb to select the target format and release.
+* **On iOS / iPadOS (Companion):**
+  * iOS does not allow third-party apps to accept drops on the Dynamic Island or to draw over other apps. *(iOS không cho phép thả file vào Dynamic Island hay vẽ đè lên app khác.)*
+  * **Share / Action Extension:** Select `image.heic` in Files or Photos ➔ Share ➔ **Convert with OrbitDrop** ➔ swipe through a format carousel (`PNG`, `WEBP`, `JPG`).
+  * **In-app Drop Zone & Shortcuts:** Drop files into the app (great with iPad Split View) or automate with App Intents.
+  * **Dynamic Island:** Shows live conversion progress via a Live Activity.
 
 ---
 
 ## 🗂️ Supported Conversion Matrix / Ma trận Định dạng Hỗ trợ
 
-| Category (Nhóm) | Input Formats (Đầu vào) | Intra-Group Targets (Cùng nhóm) | Cross-Group Targets (Chéo nhóm) | Quick Modifiers (Tham số nhanh) |
+Legend: **✅ Native** (Apple frameworks only) · **🧩 Extended** (bundled open-source codec, e.g. LAME / libwebp / ffmpeg-LGPL) · **🕒 Later** (backlog)
+
+| Category (Nhóm) | ✅ Native (M1–M2) | 🧩 Extended (M4) | 🕒 Later | Quick Modifiers (Tham số nhanh) |
 | --- | --- | --- | --- | --- |
-| **🎵 Audio** | `mp3`, `wav`, `m4a`, `aac`, `ogg`, `flac`, `caf`, `aiff` | All audio formats | ➔ **Video:** `mp4`<br><br>➔ **Text:** `txt`, `srt` (Whisper) | `LEI16`, `24-bit`, `Trim (00:00-00:08)`, `Mono`, `Normalize` |
-| **🖼️ Raster Image** | `png`, `jpg`, `webp`, `heic`, `avif`, `tiff`, `gif` | All image formats | ➔ **Icons:** `icns`, `ico`, `.appiconset`<br><br>➔ **Docs:** `pdf`, `txt` (OCR) | `Scale 1x/2x/3x`, `Quality 80%`, `Remove Alpha`, `SpriteSheet` |
-| **✒️ Vector** | `svg`, `pdf`, `eps` | `svg` ⟷ `pdf` ⟷ `eps` | ➔ **Raster:** `png`, `webp`, `icns`<br><br>➔ **Code:** SwiftUI `Shape` | `DPI 72/150/300`, `Custom Dimension` |
-| **🎬 Video** | `mp4`, `mov`, `webm`, `mkv`, `avi` | `mp4` ⟷ `mov` ⟷ `webm` | ➔ **Audio:** `mp3`, `wav`, `m4a`<br><br>➔ **Animated:** `gif`, `webp`, `png_seq` | `H.264/HEVC/ProRes`, `Trim`, `FPS 15/30/60`, `Mute Audio` |
-| **📄 Document** | `pdf`, `md`, `html`, `docx`, `txt`, `rtf`, `epub` | `md` ⟷ `html` ⟷ `pdf` ⟷ `docx` | ➔ **Image:** Render pages to `png`, `jpg` | `Merge`, `Split Pages`, `Compress PDF` |
-| **🧬 Data & Config** | `json`, `yaml`, `xml`, `plist`, `csv`, `tsv` | `json` ⟷ `yaml` ⟷ `xml` ⟷ `plist` | ➔ **Table:** `md`, `html` | `Minify`, `Prettify`, `Binary ⟷ XML Plist` |
+| **🎵 Audio** | `wav`, `aiff`, `caf`, `m4a` (AAC/ALAC) ⟷ each other; decode `mp3`, `flac` | Encode `mp3`, `ogg`/`opus`, `flac` | ➔ `txt`/`srt` (speech-to-text) | `LEI16`, `24-bit`, `Mono`, `Trim (00:00-00:08)`, `Normalize` |
+| **🖼️ Raster Image** | `heic`, `png`, `jpg`, `tiff`, `gif` ⟷ each other; decode `webp`, `avif`; `png ➔ icns` | Encode `webp`, `avif`; `ico` | OCR ➔ `txt`, `.appiconset`, SpriteSheet | `Scale 1x/2x/3x`, `Quality 80%`, `Remove Alpha` |
+| **🎬 Video** | `mov` ⟷ `mp4` (`H.264/HEVC/ProRes`), extract audio ➔ `m4a`/`wav` | `webm`, `mkv`, `avi`, ➔ `gif`/`webp` animated | `png_seq` | `Trim`, `FPS 15/30/60`, `Mute Audio` |
+| **✒️ Vector** | `pdf` ➔ `png`/`jpg` | `svg` ➔ raster | `eps`, SVG ➔ SwiftUI `Shape` | `DPI 72/150/300`, `Custom Dimension` |
+| **📄 Document** | `pdf` pages ➔ image, merge/split PDF | — | `md` ⟷ `html` ⟷ `pdf` ⟷ `docx`, `epub` | `Merge`, `Split Pages`, `Compress PDF` |
+| **🧬 Data & Config** | `json` ⟷ `plist` (binary/XML), `csv` ⟷ `tsv` | `yaml` | ➔ Markdown/HTML table | `Minify`, `Prettify` |
 
 ---
 
-## 🛠️ Native Tech Stack / Công nghệ Sử dụng
+## 🛠️ Tech Stack / Công nghệ Sử dụng
 
-Built 100% natively for Apple Silicon (`M1/M2/M3/M4`) and iOS to achieve near-zero RAM overhead and instant startup:
+Native-first for Apple Silicon to keep RAM overhead low and startup instant. Formats Apple frameworks cannot encode are handled by an optional, dynamically linked codec module.
 
-* **UI & Animations:** `SwiftUI`, `AppKit` (`NSPanel` non-activating overlay for Notch & Radial Menu), `ActivityKit` (iOS Dynamic Island).
+* **UI & Animations:** `SwiftUI`, `AppKit` (`NSPanel` non-activating overlay for Notch & Radial Menu); iOS: Share/Action Extension, `App Intents`, `ActivityKit` (progress only).
+* **Drag Detection (macOS):** `NSPasteboard(name: .drag)` + global mouse event monitor.
 * **Type Inspection:** `UniformTypeIdentifiers` (`UTType`) for zero-latency format detection.
-* **Audio Engine:** `CoreAudio`, `ExtAudioFileRef`, and `AVAssetReader`/`AVAssetWriter` (Native replacement for `afconvert` & `ffmpeg` audio trimming).
-* **Image & Vector Engine:** `ImageIO` (`CGImageSource` / `CGImageDestination`) & `CoreGraphics` hardware-accelerated pipelines.
+* **Audio Engine:** `AudioToolbox` (`ExtAudioFile`), `AVAssetReader`/`AVAssetWriter` (native replacement for `afconvert` & `ffmpeg` trimming).
+* **Image Engine:** `ImageIO` (`CGImageSource` / `CGImageDestination`) & `CoreGraphics`.
 * **Video Engine:** `AVFoundation` (`AVAssetExportSession`) & `VideoToolbox`.
+* **Extended Codecs (optional):** LAME (`mp3`), libwebp (`webp`), libopus/libvorbis, ffmpeg (LGPL build) for `webm`/`mkv`.
+* **Distribution:** Developer ID + Notarization (non-sandboxed, so output can be written next to the source file).
 
 ---
 
 ## 🗺️ Roadmap / Lộ trình Phát triển
 
+> Full plan with review notes & Definition of Done: **[ROADMAP.md](ROADMAP.md)**
+
 * [x] UX/UI Concept & Conversion Matrix Architecture
-* [ ] **Milestone 1 (macOS Core):** Global Drag-and-Drop listener + `Radial Orbit` Pie Menu overlay
-* [ ] **Milestone 2 (Notch Engine):** MacBook Notch expansion window + Trackpad scroll gesture + Waveform trimmer
-* [ ] **Milestone 3 (Native Converters):** Audio (`LEI16`, `CAF`, `WAV`, `MP3` + Trim) & Image (`HEIC`, `WEBP`, `PNG`, `ICNS`) pipelines
-* [ ] **Milestone 4 (iOS Companion):** Action Extension + Dynamic Island Dropzone support
+* [ ] **Phase 0 (Spikes):** Validate global drag detection, notch `NSPanel` drop target, native audio/image conversion, non-sandboxed output
+* [ ] **M1 (Engine + CLI):** `OrbitDropCore` Swift package + `orbitdrop` CLI — native audio (`LEI16`, `24-bit`, `Trim`) & image (`HEIC`, `PNG`, `JPG`, `ICNS`)
+* [ ] **M2 (Notch Tray MVP):** Menu bar app, drop into notch (top-center pill fallback) ➔ pick format ➔ export, batch + Undo
+* [ ] **M3 (Radial Orbit):** Drag & hold pie menu with sub-orbit presets, global hotkey alternative
+* [ ] **M4 (Extended Codecs + Trim UI):** `MP3`/`WEBP`/`OGG`/`WEBM` encoders, waveform trimmer, video basics
+* [ ] **M5 (Release 1.0 macOS):** Notarized DMG, Sparkle auto-update, onboarding
+* [ ] **M6 (iOS/iPadOS Companion):** Share/Action Extension, App Intents, in-app drop zone, Live Activity progress
 
 ---
 
@@ -107,4 +120,4 @@ Built 100% natively for Apple Silicon (`M1/M2/M3/M4`) and iOS to achieve near-ze
 
 This project is currently in the **Concept & Active Prototyping** stage.
 
-Which interaction style do you prefer: **Radial Orbit (Concept 1)** or **Notch/Dynamic Island Alchemy (Concept 2)**? Feel free to open an [Issue](https://github.com/fury-fish/DropLab/issues) or join the discussion!
+Which interaction style do you prefer: **Radial Orbit (Concept 1)** or **Notch Alchemy (Concept 2)**? Feel free to open an [Issue](https://github.com/fury-fish/DropLab/issues) or join the discussion!
