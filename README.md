@@ -109,8 +109,8 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 * [x] UX/UI Concept & Conversion Matrix Architecture
 * [ ] **Phase 0 (Spikes):** Validate global drag detection, notch `NSPanel` drop target, native audio/image conversion, non-sandboxed output
 * [ ] **M1 (Engine + CLI):** `DropLabCore` Swift package + `droplab` CLI — native audio (`LEI16`, `24-bit`, `Trim`) & image (`HEIC`, `PNG`, `JPG`, `ICNS`)
-* [ ] **M2 (Notch Tray MVP):** Menu bar app, drop into notch (top-center pill fallback) ➔ pick format ➔ export, batch + Undo
-* [ ] **M3 (Radial Orbit):** Drag & hold pie menu with sub-orbit presets, global hotkey alternative
+* [ ] **M2 (Radial Orbit MVP):** Menu bar app, drag & hold `0.4s` pie menu with sub-orbit presets, global hotkey alternative, batch + Undo
+* [ ] **M3 (Notch Tray):** Drop into notch (top-center pill fallback) ➔ pick format ➔ export
 * [ ] **M4 (Extended Codecs + Trim UI):** `MP3`/`WEBP`/`OGG`/`WEBM` encoders, waveform trimmer, video basics
 * [ ] **M5 (Release 1.0 macOS):** Notarized DMG, Sparkle auto-update, onboarding
 * [ ] **M6 (iOS/iPadOS Companion — secondary, optional):** Share/Action Extension, App Intents, in-app drop zone, Live Activity progress
