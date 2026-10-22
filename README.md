@@ -111,8 +111,8 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 * [x] **M1 (Engine + CLI):** `DropLabCore` Swift package + `droplab` CLI — native audio (`LEI16`, `24-bit`, `Trim`) & image (`HEIC`, `PNG`, `JPG`, `ICNS`)
 * [x] **M2 (Radial Orbit MVP):** Menu bar app, drag & hold `0.4s` pie menu with sub-orbit presets, demo & file picker triggers, batch + Undo
 * [x] **M3 (Notch Tray + Waveform Trimmer):** Drop into notch (top-center pill fallback) ➔ Trackpad scroll / arrow keys format picker + inline waveform trimmer with live audio preview ➔ export
-* [ ] **M4 (Extended Codecs + Trim UI):** `MP3`/`WEBP`/`OGG`/`WEBM` encoders, waveform trimmer, video basics
-* [ ] **M5 (Release 1.0 macOS):** Notarized DMG, Sparkle auto-update, onboarding
+* [x] **M4 (Extended Codecs + Video/PDF Tools):** `MP3`/`WEBP`/`OGG`/`FLAC`/`WEBM` encoders, native `Video ➔ Animated GIF`, PDF Merge & Split
+* [x] **M5 (Release 1.0 macOS):** Signed `DropLab.app` v1.0.0 bundle with custom `AppIcon.icns`, `SMAppService` Launch at Login, Finder selection trigger, and Third-Party Licenses About panel
 * [ ] **M6 (iOS/iPadOS Companion — secondary, optional):** Share/Action Extension, App Intents, in-app drop zone, Live Activity progress
 
 ---

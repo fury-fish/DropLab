@@ -2,16 +2,37 @@ import Foundation
 import AVFoundation
 import CoreMedia
 
-/// Native Video converter & trimmer built on AVAssetExportSession.
+/// Native Video converter & trimmer built on AVAssetExportSession & AVMutableComposition.
 public struct VideoConverter: FileConverter {
     public init() {}
 
     public func convert(sourceURL: URL, to outputURL: URL, options: ConversionOptions) async throws {
-        let asset = AVURLAsset(url: sourceURL)
-        let assetDuration = try await asset.load(.duration)
+        let sourceAsset = AVURLAsset(url: sourceURL)
+        let assetDuration = try await sourceAsset.load(.duration)
+
+        let exportAsset: AVAsset
+        if options.preset == .muteAudio {
+            let composition = AVMutableComposition()
+            let videoTracks = try await sourceAsset.loadTracks(withMediaType: .video)
+            for track in videoTracks {
+                if let compTrack = composition.addMutableTrack(
+                    withMediaType: .video,
+                    preferredTrackID: kCMPersistentTrackID_Invalid
+                ) {
+                    let range = CMTimeRange(start: .zero, duration: assetDuration)
+                    try? compTrack.insertTimeRange(range, of: track, at: .zero)
+                    if let preferredTransform = try? await track.load(.preferredTransform) {
+                        compTrack.preferredTransform = preferredTransform
+                    }
+                }
+            }
+            exportAsset = composition
+        } else {
+            exportAsset = sourceAsset
+        }
 
         guard let exportSession = AVAssetExportSession(
-            asset: asset,
+            asset: exportAsset,
             presetName: AVAssetExportPresetHighestQuality
         ) else {
             throw DropLabError.writerInitializationFailed("Cannot create AVAssetExportSession")

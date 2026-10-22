@@ -8,8 +8,16 @@ import DropLabCore
 final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private var settingsWindow: NSWindow?
+    private var aboutWindow: NSWindow?
 
     static func main() {
+        let args = CommandLine.arguments
+        if let idx = args.firstIndex(of: "--generate-app-icon"), idx + 1 < args.count {
+            let outputURL = URL(fileURLWithPath: args[idx + 1])
+            try? DemoSampleGenerator.generateAppIconICNS(to: outputURL)
+            return
+        }
+
         let app = NSApplication.shared
         let delegate = DropLabAppDelegate()
         app.delegate = delegate
@@ -84,6 +92,14 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
         pickFileItem.target = self
         menu.addItem(pickFileItem)
 
+        let finderSelItem = NSMenuItem(
+            title: "⚡ Mở Vòng Xoay với File đang chọn trong Finder",
+            action: #selector(openOrbitWithFinderSelection),
+            keyEquivalent: "f"
+        )
+        finderSelItem.target = self
+        menu.addItem(finderSelItem)
+
         menu.addItem(.separator())
 
         let demoNotchItem = NSMenuItem(
@@ -113,12 +129,20 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(undoItem)
 
         let settingsItem = NSMenuItem(
-            title: "⚙️ Cài đặt Vòng Xoay...",
+            title: "⚙️ Cài đặt DropLab...",
             action: #selector(openSettingsWindow),
             keyEquivalent: ","
         )
         settingsItem.target = self
         menu.addItem(settingsItem)
+
+        let aboutItem = NSMenuItem(
+            title: "ℹ️ Giới thiệu & Codec Licenses...",
+            action: #selector(openAboutWindow),
+            keyEquivalent: ""
+        )
+        aboutItem.target = self
+        menu.addItem(aboutItem)
 
         menu.addItem(.separator())
 
@@ -170,6 +194,21 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @objc private func openOrbitWithFinderSelection() {
+        let urls = FinderSelectionBridge.selectedFinderFileURLs()
+        guard !urls.isEmpty else {
+            NSSound.beep()
+            ConversionToastController.shared.showError("Hãy chọn ít nhất 1 file trong cửa sổ Finder trước")
+            return
+        }
+        let center = screenCenterPoint()
+        RadialOrbitController.shared.present(
+            for: urls,
+            at: center,
+            duringActiveDrag: false
+        )
+    }
+
     @objc private func triggerDemoAudioNotchTray() {
         guard let demoURL = try? DemoSampleGenerator.makeSampleAudioFile() else { return }
         NotchTrayController.shared.presentExpanded(with: [demoURL])
@@ -200,7 +239,7 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
         if settingsWindow == nil {
             let win = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 460, height: 370),
+                contentRect: NSRect(x: 0, y: 0, width: 460, height: 410),
                 styleMask: [.titled, .closable],
                 backing: .buffered,
                 defer: false
@@ -212,6 +251,24 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
             settingsWindow = win
         }
         settingsWindow?.makeKeyAndOrderFront(nil)
+    }
+
+    @objc private func openAboutWindow() {
+        NSApp.activate(ignoringOtherApps: true)
+        if aboutWindow == nil {
+            let win = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 480, height: 360),
+                styleMask: [.titled, .closable],
+                backing: .buffered,
+                defer: false
+            )
+            win.title = "Giới thiệu DropLab & Licenses"
+            win.center()
+            win.isReleasedWhenClosed = false
+            win.contentView = NSHostingView(rootView: AboutView())
+            aboutWindow = win
+        }
+        aboutWindow?.makeKeyAndOrderFront(nil)
     }
 
     private func screenCenterPoint() -> CGPoint {
@@ -287,5 +344,74 @@ enum DemoSampleGenerator {
         CGImageDestinationAddImage(dest, img, nil)
         CGImageDestinationFinalize(dest)
         return url
+    }
+
+    static func generateAppIconICNS(to outputURL: URL) throws {
+        let sizes = [16, 32, 64, 128, 256, 512, 1024]
+        guard let dest = CGImageDestinationCreateWithURL(
+            outputURL as CFURL,
+            "com.apple.icns" as CFString,
+            sizes.count,
+            nil
+        ) else {
+            throw DropLabError.writerInitializationFailed("Cannot create AppIcon.icns destination")
+        }
+
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        for dim in sizes {
+            guard let ctx = CGContext(
+                data: nil,
+                width: dim,
+                height: dim,
+                bitsPerComponent: 8,
+                bytesPerRow: 0,
+                space: colorSpace,
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+            ) else { continue }
+
+            let s = CGFloat(dim)
+            let inset = s * 0.08
+            let bgRect = CGRect(x: inset, y: inset, width: s - inset * 2, height: s - inset * 2)
+            let path = CGPath(roundedRect: bgRect, cornerWidth: s * 0.22, cornerHeight: s * 0.22, transform: nil)
+            ctx.addPath(path)
+            ctx.clip()
+
+            if let gradient = CGGradient(
+                colorsSpace: colorSpace,
+                colors: [
+                    CGColor(red: 0.08, green: 0.12, blue: 0.22, alpha: 1.0),
+                    CGColor(red: 0.04, green: 0.06, blue: 0.12, alpha: 1.0)
+                ] as CFArray,
+                locations: [0.0, 1.0]
+            ) {
+                ctx.drawLinearGradient(
+                    gradient,
+                    start: CGPoint(x: 0, y: s),
+                    end: CGPoint(x: s, y: 0),
+                    options: []
+                )
+            }
+
+            // Outer Radial Orbit amber ring
+            ctx.setStrokeColor(CGColor(red: 1.0, green: 0.62, blue: 0.12, alpha: 0.92))
+            ctx.setLineWidth(max(1.5, s * 0.075))
+            ctx.addArc(
+                center: CGPoint(x: s * 0.5, y: s * 0.5),
+                radius: s * 0.29,
+                startAngle: 0,
+                endAngle: .pi * 2,
+                clockwise: false
+            )
+            ctx.strokePath()
+
+            // Inner Cyan Core
+            ctx.setFillColor(CGColor(red: 0.12, green: 0.72, blue: 0.98, alpha: 1.0))
+            ctx.fillEllipse(in: CGRect(x: s * 0.36, y: s * 0.36, width: s * 0.28, height: s * 0.28))
+
+            if let cgImage = ctx.makeImage() {
+                CGImageDestinationAddImage(dest, cgImage, nil)
+            }
+        }
+        CGImageDestinationFinalize(dest)
     }
 }

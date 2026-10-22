@@ -17,6 +17,14 @@ public enum ConversionPreset: String, Codable, CaseIterable, Identifiable, Senda
     case quality80 = "quality80"
     case removeAlpha = "noalpha"
 
+    // Video & GIF presets
+    case muteAudio = "mute"
+    case fps15 = "fps15"
+
+    // Document (PDF) presets
+    case mergePDF = "merge"
+    case splitPages = "split"
+
     // Data presets
     case prettify = "prettify"
     case minify = "minify"
@@ -38,6 +46,10 @@ public enum ConversionPreset: String, Codable, CaseIterable, Identifiable, Senda
         case .scale05x: return "Scale 0.5x"
         case .quality80: return "80% Qual"
         case .removeAlpha: return "No Alpha"
+        case .muteAudio: return "Tắt tiếng"
+        case .fps15: return "15 FPS"
+        case .mergePDF: return "Gộp PDF"
+        case .splitPages: return "Tách trang"
         case .prettify: return "Prettify"
         case .minify: return "Minify"
         case .binaryPlist: return "Binary"
@@ -58,6 +70,10 @@ public enum ConversionPreset: String, Codable, CaseIterable, Identifiable, Senda
         case .scale05x: return "05x"
         case .quality80: return "q80"
         case .removeAlpha: return "opaque"
+        case .muteAudio: return "muted"
+        case .fps15: return "15fps"
+        case .mergePDF: return "merged"
+        case .splitPages: return "page1"
         case .prettify: return "pretty"
         case .minify: return "min"
         case .binaryPlist: return "bin"

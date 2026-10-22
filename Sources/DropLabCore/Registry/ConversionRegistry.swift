@@ -34,8 +34,16 @@ public struct ConversionRegistry: Sendable {
                     subOrbitPresets: [.standard, .alac, .trim8s]
                 ),
                 OrbitSliceSpec(
-                    targetFormat: .aiff,
-                    subOrbitPresets: [.lei16, .pcm24, .trim8s]
+                    targetFormat: .mp3,
+                    subOrbitPresets: [.standard, .trim8s, .mono]
+                ),
+                OrbitSliceSpec(
+                    targetFormat: .ogg,
+                    subOrbitPresets: [.standard, .trim8s, .mono]
+                ),
+                OrbitSliceSpec(
+                    targetFormat: .flac,
+                    subOrbitPresets: [.standard, .trim8s, .mono]
                 )
             ]
 
@@ -44,6 +52,10 @@ public struct ConversionRegistry: Sendable {
                 OrbitSliceSpec(
                     targetFormat: .png,
                     subOrbitPresets: [.standard, .scale2x, .scale05x, .removeAlpha]
+                ),
+                OrbitSliceSpec(
+                    targetFormat: .webp,
+                    subOrbitPresets: [.quality80, .standard, .scale2x, .scale05x]
                 ),
                 OrbitSliceSpec(
                     targetFormat: .jpg,
@@ -58,12 +70,8 @@ public struct ConversionRegistry: Sendable {
                     subOrbitPresets: [.standard]
                 ),
                 OrbitSliceSpec(
-                    targetFormat: .tiff,
-                    subOrbitPresets: [.standard, .removeAlpha]
-                ),
-                OrbitSliceSpec(
                     targetFormat: .pdf,
-                    subOrbitPresets: [.standard]
+                    subOrbitPresets: [.standard, .mergePDF]
                 )
             ]
 
@@ -71,11 +79,19 @@ public struct ConversionRegistry: Sendable {
             return [
                 OrbitSliceSpec(
                     targetFormat: .mp4,
-                    subOrbitPresets: [.standard, .trim8s]
+                    subOrbitPresets: [.standard, .trim8s, .muteAudio]
                 ),
                 OrbitSliceSpec(
                     targetFormat: .mov,
-                    subOrbitPresets: [.standard, .trim8s]
+                    subOrbitPresets: [.standard, .trim8s, .muteAudio]
+                ),
+                OrbitSliceSpec(
+                    targetFormat: .gif,
+                    subOrbitPresets: [.fps15, .trim8s]
+                ),
+                OrbitSliceSpec(
+                    targetFormat: .webm,
+                    subOrbitPresets: [.standard, .trim8s, .muteAudio]
                 ),
                 OrbitSliceSpec(
                     targetFormat: .wav,
@@ -96,6 +112,10 @@ public struct ConversionRegistry: Sendable {
                 OrbitSliceSpec(
                     targetFormat: .jpg,
                     subOrbitPresets: [.quality80, .standard]
+                ),
+                OrbitSliceSpec(
+                    targetFormat: .pdf,
+                    subOrbitPresets: [.splitPages, .mergePDF]
                 )
             ]
 

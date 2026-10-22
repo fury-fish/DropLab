@@ -2,6 +2,7 @@ import XCTest
 import AVFoundation
 import CoreGraphics
 import ImageIO
+import PDFKit
 @testable import DropLabCore
 
 final class DropLabCoreTests: XCTestCase {
@@ -24,7 +25,7 @@ final class DropLabCoreTests: XCTestCase {
         XCTAssertEqual(FileCategory.detect(for: mp3URL), .audio)
 
         let audioSlices = ConversionRegistry().orbitSlices(for: mp3URL)
-        XCTAssertEqual(audioSlices.map(\.targetFormat), [.wav, .caf, .m4a, .aiff])
+        XCTAssertEqual(audioSlices.map(\.targetFormat), [.wav, .caf, .m4a, .mp3, .ogg, .flac])
         XCTAssertTrue(audioSlices[0].subOrbitPresets.contains(.lei16))
         XCTAssertTrue(audioSlices[0].subOrbitPresets.contains(.pcm24))
         XCTAssertTrue(audioSlices[0].subOrbitPresets.contains(.trim8s))
@@ -33,6 +34,7 @@ final class DropLabCoreTests: XCTestCase {
         XCTAssertEqual(FileCategory.detect(for: heicURL), .image)
         let imageSlices = ConversionRegistry().orbitSlices(for: heicURL)
         XCTAssertTrue(imageSlices.map(\.targetFormat).contains(.png))
+        XCTAssertTrue(imageSlices.map(\.targetFormat).contains(.webp))
         XCTAssertTrue(imageSlices.map(\.targetFormat).contains(.icns))
     }
 
@@ -150,6 +152,29 @@ final class DropLabCoreTests: XCTestCase {
         let undone = ConversionHistory.shared.undoLastBatch()
         XCTAssertEqual(undone.count, 1)
         XCTAssertFalse(FileManager.default.fileExists(atPath: generatedURL.path))
+    }
+
+    func testPDFMergeAndSplit() async throws {
+        let img1 = tempDir.appendingPathComponent("page1.png")
+        let img2 = tempDir.appendingPathComponent("page2.png")
+        try createTestPNG(at: img1, width: 200, height: 200)
+        try createTestPNG(at: img2, width: 200, height: 200)
+
+        let mergedBatch = try await DropLabEngine.shared.convertBatch(
+            urls: [img1, img2],
+            options: ConversionOptions(targetFormat: .pdf, preset: .mergePDF),
+            recordHistory: false
+        )
+        XCTAssertEqual(mergedBatch.count, 1)
+        let mergedPDFURL = mergedBatch[0].outputURL
+        let pdfDoc = PDFDocument(url: mergedPDFURL)
+        XCTAssertEqual(pdfDoc?.pageCount, 2)
+
+        let splitResult = try await DropLabEngine.shared.convertFile(
+            at: mergedPDFURL,
+            options: ConversionOptions(targetFormat: .pdf, preset: .splitPages)
+        )
+        XCTAssertTrue(FileManager.default.fileExists(atPath: splitResult.outputURL.path))
     }
 
     private func createSineWaveAudio(at url: URL, durationSeconds: Double) throws {

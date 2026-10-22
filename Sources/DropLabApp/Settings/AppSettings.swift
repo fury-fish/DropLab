@@ -1,4 +1,5 @@
 import Foundation
+import ServiceManagement
 import Combine
 
 /// Persistent user preferences for DropLab on macOS.
@@ -30,6 +31,17 @@ public final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(revealInFinderAfterConvert, forKey: "revealInFinderAfterConvert") }
     }
 
+    @Published public var launchAtLogin: Bool {
+        didSet {
+            UserDefaults.standard.set(launchAtLogin, forKey: "launchAtLogin")
+            if launchAtLogin {
+                try? SMAppService.mainApp.register()
+            } else {
+                try? SMAppService.mainApp.unregister()
+            }
+        }
+    }
+
     private init() {
         let defaults = UserDefaults.standard
         if defaults.object(forKey: "radialOrbitEnabled") == nil {
@@ -51,5 +63,6 @@ public final class AppSettings: ObservableObject {
         self.requireOptionKeyDuringDrag = defaults.bool(forKey: "requireOptionKeyDuringDrag")
         self.playSoundOnConvert = defaults.bool(forKey: "playSoundOnConvert")
         self.revealInFinderAfterConvert = defaults.bool(forKey: "revealInFinderAfterConvert")
+        self.launchAtLogin = (SMAppService.mainApp.status == .enabled) || defaults.bool(forKey: "launchAtLogin")
     }
 }

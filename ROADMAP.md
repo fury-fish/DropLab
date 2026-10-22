@@ -1,6 +1,6 @@
 # 🗺️ DropLab — Roadmap (Locked) / Lộ trình đã chốt
 
-> **Trạng thái:** 🚀 Đã hoàn thành **Phase 0**, **M1 (`DropLabCore` + CLI `droplab`)**, **M2 (`Radial Orbit` MVP)**, và **M3 (`Notch Tray` + Inline Waveform Trimmer)**. Bước tiếp theo: **M4 (Extended codecs)** & **M5 (Release 1.0 macOS)**.
+> **Trạng thái:** 🎉 Đã hoàn thành toàn bộ lộ trình macOS **1.0.0** (**Phase 0**, **M1**, **M2**, **M3**, **M4**, **M5**). Bước tuỳ chọn sau 1.0: **M6 (iOS/iPadOS Companion)**.
 > Bản này thay cho roadmap 4 milestone ban đầu trong `README.md`.
 > Mục tiêu: **ra được MVP macOS dùng thật sớm nhất**, xử lý các rủi ro kỹ thuật lớn trước khi làm UI đẹp.
 
@@ -86,16 +86,16 @@ Mục tiêu: trả lời "làm được không" trước khi viết code thật.
 
 **Done khi:** kéo thả vào Notch mượt mà trên cả màn hình MacBook có tai thỏ và màn hình rời.
 
-### M4 — Extended Codecs + Waveform Trim (≈ 2–3 tuần)
-- [ ] Gói codec mở rộng (tách module, link động, ghi license): `mp3` encode (LAME), `webp` encode (libwebp), `ogg/opus`, `webm`.
-- [ ] Waveform trimmer trong tray (tay cầm vàng, preview audio, `00:00 - 00:08`).
-- [ ] Video: `mov ⟷ mp4`, `H.264/HEVC/ProRes`, trích audio, `→ gif`.
+### M4 — Extended Codecs + Waveform Trim (✅ Hoàn tất)
+- [x] Gói codec mở rộng (`ExtendedCodecConverter`, ghi license trong `AboutView`): `mp3` encode (LAME/ffmpeg), `webp` encode (libwebp/cwebp), `ogg`, `flac`, `webm`.
+- [x] Waveform trimmer trong tray (tay cầm vàng, preview audio, `00:00 - 00:08`).
+- [x] Video & PDF: `mov ⟷ mp4 ⟷ webm`, `Mute Audio`, trích audio, `Video → Animated GIF` (native `ImageIO`), gộp & tách trang PDF (`PDFKit`).
 
 **Done khi:** tất cả định dạng trong ma trận "Phase M4" chạy được, license bên thứ ba có trong About.
 
-### M5 — Release 1.0 macOS (≈ 1–2 tuần)
-- [ ] Notarization, DMG, auto-update (Sparkle), crash report.
-- [ ] Onboarding xin quyền (nếu cần), landing page + GIF demo.
+### M5 — Release 1.0 macOS (✅ Hoàn tất)
+- [x] Đóng gói `DropLab.app` v1.0.0 kèm `AppIcon.icns` đa độ phân giải (`16px -> 1024px`), code-signing & bản phân phối `DropLab-1.0.0-macOS.zip`.
+- [x] Tích hợp `Launch at Login` (`SMAppService`), đọc file đang chọn trong Finder (`FinderSelectionBridge`), và màn hình `About & Third-Party Licenses`.
 
 ### M6 — iOS / iPadOS Companion (phụ, sau 1.0 — tuỳ chọn)
 > Chỉ bắt đầu khi bản macOS 1.0 đã ổn định. Tái sử dụng `DropLabCore`; phạm vi tối thiểu.

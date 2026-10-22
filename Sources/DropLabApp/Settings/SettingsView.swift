@@ -41,11 +41,12 @@ public struct SettingsView: View {
             Section {
                 Toggle("Phát âm thanh khi chuyển đổi hoàn tất", isOn: $settings.playSoundOnConvert)
                 Toggle("Tự động hiển thị file mới trong Finder", isOn: $settings.revealInFinderAfterConvert)
+                Toggle("Khởi động DropLab cùng macOS (Launch at Login)", isOn: $settings.launchAtLogin)
             } header: {
-                Label("Sau khi chuyển đổi", systemImage: "sparkles")
+                Label("Hệ thống & Sau khi chuyển đổi", systemImage: "sparkles")
             }
         }
         .formStyle(.grouped)
-        .frame(width: 460, height: 370)
+        .frame(width: 460, height: 410)
     }
 }

@@ -1,17 +1,21 @@
 import Foundation
 import UniformTypeIdentifiers
 
-/// Supported output formats in DropLabCore.
+/// Supported output formats in DropLabCore (Native + Extended Codecs).
 public enum TargetFormat: String, Codable, CaseIterable, Identifiable, Sendable {
     // Audio
     case wav
     case caf
     case m4a
+    case mp3
+    case flac
+    case ogg
     case aiff
 
     // Image
     case png
     case jpg
+    case webp
     case heic
     case tiff
     case gif
@@ -20,6 +24,7 @@ public enum TargetFormat: String, Codable, CaseIterable, Identifiable, Sendable 
     // Video
     case mp4
     case mov
+    case webm
 
     // Document / Data
     case pdf
@@ -40,11 +45,11 @@ public enum TargetFormat: String, Codable, CaseIterable, Identifiable, Sendable 
 
     public var category: FileCategory {
         switch self {
-        case .wav, .caf, .m4a, .aiff:
+        case .wav, .caf, .m4a, .mp3, .flac, .ogg, .aiff:
             return .audio
-        case .png, .jpg, .heic, .tiff, .gif, .icns:
+        case .png, .jpg, .webp, .heic, .tiff, .gif, .icns:
             return .image
-        case .mp4, .mov:
+        case .mp4, .mov, .webm:
             return .video
         case .pdf:
             return .document
@@ -55,13 +60,13 @@ public enum TargetFormat: String, Codable, CaseIterable, Identifiable, Sendable 
 
     public var systemSymbolName: String {
         switch self {
-        case .wav, .caf, .m4a, .aiff:
+        case .wav, .caf, .m4a, .mp3, .flac, .ogg, .aiff:
             return "waveform"
-        case .png, .jpg, .heic, .tiff, .gif:
+        case .png, .jpg, .webp, .heic, .tiff, .gif:
             return "photo"
         case .icns:
             return "app.dashed"
-        case .mp4, .mov:
+        case .mp4, .mov, .webm:
             return "film"
         case .pdf:
             return "doc.richtext"
