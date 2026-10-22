@@ -130,6 +130,28 @@ final class DropLabCoreTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: backToJSON.outputURL.path))
     }
 
+    func testWaveformAnalyzerAndUndoHistory() async throws {
+        let sourceURL = tempDir.appendingPathComponent("waveform_test.wav")
+        try createSineWaveAudio(at: sourceURL, durationSeconds: 6.0)
+
+        let summary = await WaveformAnalyzer.analyze(url: sourceURL, barCount: 32)
+        XCTAssertEqual(summary.peaks.count, 32)
+        XCTAssertEqual(summary.durationSeconds, 6.0, accuracy: 0.25)
+
+        let batch = try await DropLabEngine.shared.convertBatch(
+            urls: [sourceURL],
+            options: ConversionOptions(targetFormat: .caf, preset: .lei16),
+            recordHistory: true
+        )
+        XCTAssertEqual(batch.count, 1)
+        let generatedURL = batch[0].outputURL
+        XCTAssertTrue(FileManager.default.fileExists(atPath: generatedURL.path))
+
+        let undone = ConversionHistory.shared.undoLastBatch()
+        XCTAssertEqual(undone.count, 1)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: generatedURL.path))
+    }
+
     private func createSineWaveAudio(at url: URL, durationSeconds: Double) throws {
         let sampleRate = 44_100.0
         let frames = AVAudioFrameCount(sampleRate * durationSeconds)

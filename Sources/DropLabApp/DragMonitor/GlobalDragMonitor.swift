@@ -40,14 +40,13 @@ public final class GlobalDragMonitor: ObservableObject {
     }
 
     private func pollTick() {
-        guard AppSettings.shared.radialOrbitEnabled else { return }
-
         let leftMouseDown = (NSEvent.pressedMouseButtons & 1) != 0
         if !leftMouseDown {
             if isDraggingSessionActive {
                 isDraggingSessionActive = false
                 hasPresentedOrbitInCurrentDrag = false
                 activeDragURLs = []
+                NotchTrayController.shared.hideDropTargetPillIfNotExpanded()
             }
             return
         }
@@ -61,22 +60,35 @@ public final class GlobalDragMonitor: ObservableObject {
             hasPresentedOrbitInCurrentDrag = false
             anchorLocation = NSEvent.mouseLocation
             anchorTimestamp = ProcessInfo.processInfo.systemUptime
+            if isDraggingSessionActive && AppSettings.shared.notchTrayEnabled {
+                NotchTrayController.shared.showDropTargetPill()
+            }
         }
 
-        guard isDraggingSessionActive,
+        guard isDraggingSessionActive else { return }
+
+        let currentLoc = NSEvent.mouseLocation
+        if isCursorInTopNotchZone(currentLoc) {
+            // While hovering near the top Notch drop zone, reset hold timer so Radial Orbit doesn't cover the Notch
+            anchorLocation = currentLoc
+            anchorTimestamp = ProcessInfo.processInfo.systemUptime
+            return
+        }
+
+        guard AppSettings.shared.radialOrbitEnabled,
               !hasPresentedOrbitInCurrentDrag,
-              !RadialOrbitController.shared.isPresented else {
+              !RadialOrbitController.shared.isPresented,
+              !NotchTrayController.shared.isExpanded else {
             return
         }
 
         if AppSettings.shared.requireOptionKeyDuringDrag,
            !NSEvent.modifierFlags.contains(.option) {
-            anchorLocation = NSEvent.mouseLocation
+            anchorLocation = currentLoc
             anchorTimestamp = ProcessInfo.processInfo.systemUptime
             return
         }
 
-        let currentLoc = NSEvent.mouseLocation
         let dist = hypot(currentLoc.x - anchorLocation.x, currentLoc.y - anchorLocation.y)
         let now = ProcessInfo.processInfo.systemUptime
 
@@ -96,6 +108,18 @@ public final class GlobalDragMonitor: ObservableObject {
                 duringActiveDrag: true
             )
         }
+    }
+
+    private func isCursorInTopNotchZone(_ point: CGPoint) -> Bool {
+        guard AppSettings.shared.notchTrayEnabled else { return false }
+        guard let screen = NSScreen.screens.first(where: { NSMouseInRect(point, $0.frame, false) }) ?? NSScreen.main else {
+            return false
+        }
+        let topStripHeight: CGFloat = 95
+        let horizontalSpan: CGFloat = 420
+        let inTopY = point.y >= (screen.frame.maxY - topStripHeight)
+        let inCenterX = abs(point.x - screen.frame.midX) <= (horizontalSpan * 0.5)
+        return inTopY && inCenterX
     }
 
     private func extractFileURLsFromDragPasteboard() -> [URL] {

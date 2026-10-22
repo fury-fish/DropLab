@@ -41,7 +41,7 @@ public enum FileCategory: String, Codable, CaseIterable, Sendable {
         switch ext {
         case "mp3", "wav", "wave", "m4a", "aac", "caf", "aiff", "aif", "flac", "ogg", "opus":
             return .audio
-        case "png", "jpg", "jpeg", "heic", "heif", "tiff", "tif", "gif", "webp", "avif", "icns", "bmp":
+        case "png", "jpg", "jpeg", "heic", "heif", "tiff", "tif", "gif", "webp", "avif", "icns", "bmp", "svg":
             return .image
         case "mp4", "mov", "m4v", "webm", "mkv", "avi":
             return .video

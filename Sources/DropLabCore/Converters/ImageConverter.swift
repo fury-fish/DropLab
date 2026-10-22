@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 import CoreGraphics
 import ImageIO
 import UniformTypeIdentifiers
@@ -89,11 +90,24 @@ public struct ImageConverter: FileConverter {
             }
         }
 
-        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
-              let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
-            throw DropLabError.readerInitializationFailed("Cannot decode image from \(url.lastPathComponent)")
+        if let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+           let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) {
+            return cgImage
         }
-        return cgImage
+
+        if let nsImage = NSImage(contentsOf: url) {
+            var rect = CGRect(
+                x: 0,
+                y: 0,
+                width: max(64, nsImage.size.width),
+                height: max(64, nsImage.size.height)
+            )
+            if let cgImage = nsImage.cgImage(forProposedRect: &rect, context: nil, hints: nil) {
+                return cgImage
+            }
+        }
+
+        throw DropLabError.readerInitializationFailed("Cannot decode image from \(url.lastPathComponent)")
     }
 
     private func transformImage(

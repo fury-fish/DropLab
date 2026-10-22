@@ -1,6 +1,6 @@
 # 🗺️ DropLab — Roadmap (Locked) / Lộ trình đã chốt
 
-> **Trạng thái:** 🚀 Đã hoàn thành **Phase 0**, **M1 (`DropLabCore` + CLI `droplab`)**, và **M2 (`Radial Orbit` MVP macOS)**. Bước tiếp theo: **M3 (Notch Tray)**.
+> **Trạng thái:** 🚀 Đã hoàn thành **Phase 0**, **M1 (`DropLabCore` + CLI `droplab`)**, **M2 (`Radial Orbit` MVP)**, và **M3 (`Notch Tray` + Inline Waveform Trimmer)**. Bước tiếp theo: **M4 (Extended codecs)** & **M5 (Release 1.0 macOS)**.
 > Bản này thay cho roadmap 4 milestone ban đầu trong `README.md`.
 > Mục tiêu: **ra được MVP macOS dùng thật sớm nhất**, xử lý các rủi ro kỹ thuật lớn trước khi làm UI đẹp.
 
@@ -78,10 +78,11 @@ Mục tiêu: trả lời "làm được không" trước khi viết code thật.
 
 **Done khi:** dùng hằng ngày được cho workflow `mp3 → wav LEI16` và `heic → png` bằng vòng xoay tại con trỏ mà không mở cửa sổ nào, không làm hỏng drag & drop thông thường giữa các app (Finder, Safari, Xcode, Slack).
 
-### M3 — Notch Tray (macOS) (≈ 2 tuần)
-- [ ] Vùng drop ở notch; fallback viên thuốc top-center cho máy không notch / màn hình ngoài.
-- [ ] Luồng: **thả file → tray mở → chọn định dạng (scroll / click / ← → / Enter) → xuất cạnh file gốc**.
-- [ ] Tích hợp vào Settings để người dùng bật/tắt độc lập Radial Orbit, Notch Tray hoặc dùng cả hai cùng lúc.
+### M3 — Notch Tray (macOS) (✅ Hoàn tất)
+- [x] Vùng drop ở notch; fallback viên thuốc top-center cho máy không notch / màn hình ngoài.
+- [x] Luồng: **thả file → tray mở → chọn định dạng (scroll Trackpad / click / ← → / Enter) → xuất cạnh file gốc**.
+- [x] Inline Waveform Trimmer ngay trong tray (tay cầm vàng kéo thả, nghe thử `Space`, cắt `00:00 - 00:08` hoặc tuỳ chọn).
+- [x] Tích hợp vào Settings để người dùng bật/tắt độc lập Radial Orbit, Notch Tray hoặc dùng cả hai cùng lúc.
 
 **Done khi:** kéo thả vào Notch mượt mà trên cả màn hình MacBook có tai thỏ và màn hình rời.
 

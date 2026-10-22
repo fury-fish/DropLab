@@ -26,6 +26,10 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
                 self?.triggerDemoAudioOrbit()
             }
+        } else if CommandLine.arguments.contains("--demo-notch") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+                self?.triggerDemoAudioNotchTray()
+            }
         }
     }
 
@@ -79,6 +83,24 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
         )
         pickFileItem.target = self
         menu.addItem(pickFileItem)
+
+        menu.addItem(.separator())
+
+        let demoNotchItem = NSMenuItem(
+            title: "🏝️ Mở Lò Luyện Tai Thỏ Mẫu (Waveform: match.wav)",
+            action: #selector(triggerDemoAudioNotchTray),
+            keyEquivalent: "n"
+        )
+        demoNotchItem.target = self
+        menu.addItem(demoNotchItem)
+
+        let pickNotchFileItem = NSMenuItem(
+            title: "📥 Chọn File đưa vào Lò Luyện Tai Thỏ...",
+            action: #selector(pickFileAndOpenNotchTray),
+            keyEquivalent: "t"
+        )
+        pickNotchFileItem.target = self
+        menu.addItem(pickNotchFileItem)
 
         menu.addItem(.separator())
 
@@ -148,6 +170,23 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @objc private func triggerDemoAudioNotchTray() {
+        guard let demoURL = try? DemoSampleGenerator.makeSampleAudioFile() else { return }
+        NotchTrayController.shared.presentExpanded(with: [demoURL])
+    }
+
+    @objc private func pickFileAndOpenNotchTray() {
+        NSApp.activate(ignoringOtherApps: true)
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = true
+        panel.prompt = "Đưa vào Tai Thỏ"
+        if panel.runModal() == .OK, !panel.urls.isEmpty {
+            NotchTrayController.shared.presentExpanded(with: panel.urls)
+        }
+    }
+
     @objc private func undoLastConversion() {
         let removed = ConversionHistory.shared.undoLastBatch()
         if removed.isEmpty {
@@ -161,7 +200,7 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
         if settingsWindow == nil {
             let win = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 440, height: 280),
+                contentRect: NSRect(x: 0, y: 0, width: 460, height: 370),
                 styleMask: [.titled, .closable],
                 backing: .buffered,
                 defer: false

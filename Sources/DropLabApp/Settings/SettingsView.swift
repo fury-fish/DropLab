@@ -29,6 +29,16 @@ public struct SettingsView: View {
             }
 
             Section {
+                Toggle("Bật Lò Luyện Tai Thỏ (Notch Tray)", isOn: $settings.notchTrayEnabled)
+                    .font(.headline)
+                Text("Kéo file lên sát mép trên màn hình (hoặc vùng Tai thỏ MacBook) để mở khay xử lý nhanh, cuộn Trackpad chọn định dạng và cắt Waveform trực tiếp.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Label("Concept 2 — Notch Alchemy", systemImage: "macbook")
+            }
+
+            Section {
                 Toggle("Phát âm thanh khi chuyển đổi hoàn tất", isOn: $settings.playSoundOnConvert)
                 Toggle("Tự động hiển thị file mới trong Finder", isOn: $settings.revealInFinderAfterConvert)
             } header: {
@@ -36,6 +46,6 @@ public struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 440, height: 280)
+        .frame(width: 460, height: 370)
     }
 }
