@@ -82,6 +82,12 @@ final class OrbitDropReceiverView: NSView {
         guard let slice = viewModel.activeSlice else {
             return false
         }
+        let pb = sender.draggingPasteboard
+        let readOpts: [NSPasteboard.ReadingOptionKey: Any] = [.urlReadingFileURLsOnly: true]
+        if let droppedURLs = pb.readObjects(forClasses: [NSURL.self], options: readOpts) as? [URL],
+           !droppedURLs.isEmpty {
+            viewModel.sourceURLs = droppedURLs
+        }
         let preset = viewModel.activePreset
         viewModel.onSelectConversion?(slice.targetFormat, preset)
         return true

@@ -19,6 +19,13 @@ public final class DropLabEngine: Sendable {
         at sourceURL: URL,
         options: ConversionOptions
     ) async throws -> ConversionResult {
+        let didStartAccessing = sourceURL.startAccessingSecurityScopedResource()
+        defer {
+            if didStartAccessing {
+                sourceURL.stopAccessingSecurityScopedResource()
+            }
+        }
+
         guard FileManager.default.fileExists(atPath: sourceURL.path) else {
             throw DropLabError.fileNotFound(sourceURL)
         }

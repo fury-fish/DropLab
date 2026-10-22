@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import CoreGraphics
+import CoreImage
 import ImageIO
 import UniformTypeIdentifiers
 import PDFKit
@@ -95,6 +96,19 @@ public struct ImageConverter: FileConverter {
             return cgImage
         }
 
+        if let data = try? Data(contentsOf: url),
+           let source = CGImageSourceCreateWithData(data as CFData, nil),
+           let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) {
+            return cgImage
+        }
+
+        if let ciImage = CIImage(contentsOf: url) {
+            let ciContext = CIContext(options: nil)
+            if let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) {
+                return cgImage
+            }
+        }
+
         if let nsImage = NSImage(contentsOf: url) {
             var rect = CGRect(
                 x: 0,
@@ -105,6 +119,10 @@ public struct ImageConverter: FileConverter {
             if let cgImage = nsImage.cgImage(forProposedRect: &rect, context: nil, hints: nil) {
                 return cgImage
             }
+        }
+
+        if !FileManager.default.isReadableFile(atPath: url.path) {
+            throw DropLabError.readerInitializationFailed("macOS blocked access to \(url.lastPathComponent). Please grant Files & Folders access to DropLab.")
         }
 
         throw DropLabError.readerInitializationFailed("Cannot decode image from \(url.lastPathComponent)")
