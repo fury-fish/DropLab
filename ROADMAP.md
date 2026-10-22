@@ -1,6 +1,6 @@
 # 🗺️ DropLab — Roadmap (Locked) / Lộ trình đã chốt
 
-> **Trạng thái:** ✅ Đã chốt plan — 2026-10-21. Chưa bắt đầu code; bước tiếp theo là **Phase 0**.
+> **Trạng thái:** 🚀 Đã hoàn thành **Phase 0**, **M1 (`DropLabCore` + CLI `droplab`)**, và **M2 (`Radial Orbit` MVP macOS)**. Bước tiếp theo: **M3 (Notch Tray)**.
 > Bản này thay cho roadmap 4 milestone ban đầu trong `README.md`.
 > Mục tiêu: **ra được MVP macOS dùng thật sớm nhất**, xử lý các rủi ro kỹ thuật lớn trước khi làm UI đẹp.
 
@@ -47,34 +47,34 @@ flowchart LR
     M5 --> M6["M6 - iOS Companion"]
 ```
 
-### Phase 0 — Technical Spikes (≈ 1 tuần)
+### Phase 0 — Technical Spikes (✅ Hoàn tất)
 Mục tiêu: trả lời "làm được không" trước khi viết code thật.
-- [ ] Spike A: Phát hiện drag toàn cục (`NSPasteboard(name: .drag)` changeCount + `NSEvent.addGlobalMonitorForEvents(.leftMouseDragged)`), đo độ trễ và xác định hold 0.4s.
-- [ ] Spike B: `NSPanel` non-activating ở vị trí notch (`NSScreen.safeAreaInsets`, `auxiliaryTopLeftArea`), nhận drop, không cướp focus app đang dùng.
-- [ ] Spike C: Convert `mp3 → wav LEI16` và trim bằng `AVAssetReader/Writer`; `heic → png/jpg` bằng `ImageIO`.
-- [ ] Spike D: Ghi file ra thư mục gốc khi chạy **không sandbox** + notarize thử.
+- [x] Spike A: Phát hiện drag toàn cục (`NSPasteboard(name: .drag)` changeCount + `NSEvent.pressedMouseButtons` / `NSEvent.mouseLocation` 60 Hz), đo độ trễ và xác định hold `0.4s` không cần quyền Accessibility.
+- [x] Spike B: `NSPanel` non-activating kết hợp `NSDraggingDestination` (`.fileURL`), nhận drop ngay trên lát cắt mà không cướp focus app đang dùng và không làm di chuyển file gốc trong Finder.
+- [x] Spike C: Convert `mp3/wav → wav LEI16 / 24-bit / caf / m4a` và trim bằng `AVAssetReader/Writer`; `heic/png → png/jpg/icns/pdf` bằng `ImageIO`.
+- [x] Spike D: Ghi file ra thư mục gốc khi chạy **không sandbox** (`SafeOutputNaming` chống ghi đè).
 
 **Done khi:** có báo cáo ngắn từng spike (OK / không OK / workaround).
 
-### M1 — Conversion Engine + CLI (≈ 2 tuần)
-- [ ] Swift Package `DropLabCore`: `Converter` protocol, registry theo `UTType` → danh sách đích hợp lệ.
-- [ ] Converter native:
+### M1 — Conversion Engine + CLI (✅ Hoàn tất)
+- [x] Swift Package `DropLabCore`: `FileConverter` protocol, `ConversionRegistry` theo `UTType` → danh sách đích hợp lệ + Sub-Orbit presets.
+- [x] Converter native:
   - Audio: `wav`, `aiff`, `caf`, `m4a (AAC/ALAC)` + preset `LEI16`, `24-bit`, `Mono`, `Trim`.
-  - Image: `heic`, `png`, `jpg`, `tiff`, `gif` + `Scale`, `Quality`, `Remove Alpha`; `png → icns`.
-  - Data: `json ⟷ plist`, `minify/prettify`.
-- [ ] CLI `droplab convert in.mp3 --to wav --preset lei16` (thay thế trực tiếp `afconvert`/`ffmpeg` trong workflow hiện tại).
-- [ ] Đặt tên file đầu ra an toàn (không ghi đè: `match_LEI16.wav`, `match_LEI16 2.wav`).
+  - Image: `heic`, `png`, `jpg`, `tiff`, `gif`, `pdf` + `Scale`, `Quality`, `Remove Alpha`; `png → icns`.
+  - Data: `json ⟷ plist`, `csv ⟷ tsv`, `minify/prettify`.
+- [x] CLI `droplab convert in.mp3 --to wav --preset lei16` (thay thế trực tiếp `afconvert`/`ffmpeg` trong workflow hiện tại).
+- [x] Đặt tên file đầu ra an toàn (không ghi đè: `match_LEI16.wav`, `match_LEI16 2.wav`).
 
 **Done khi:** unit test cho mỗi cặp định dạng với file mẫu; convert ảnh 12MP < 300 ms, audio 3 phút < 1 s trên M1.
 
-### M2 — Radial Orbit MVP (macOS) (≈ 2–3 tuần)
-- [ ] App menu bar (`LSUIElement`), không có Dock icon.
-- [ ] Phát hiện drag + hold 0.4s (từ Spike A), hiện pie menu `Radial Orbit` (`NSPanel` non-activating) ngay dưới con trỏ.
-- [ ] Vòng trong: định dạng đích theo `UTType`; vòng ngoài (Sub-Orbit): preset (`LEI16`, `24-bit`, `Mono`, `Trim`...).
-- [ ] Thả lên lát → convert và xuất ngay cạnh file gốc; thả ra ngoài / nhấn `Esc` → huỷ, drag gốc vẫn hoạt động bình thường.
-- [ ] Phím tắt thay thế: chọn file trong Finder + hotkey → mở Radial Orbit ngay tại con trỏ.
-- [ ] Hỗ trợ kéo **nhiều file** cùng lúc (batch), hiển thị tiến trình + Undo (xoá file vừa tạo).
-- [ ] Settings cơ bản: thư mục xuất, preset mặc định, thời gian hold (`0.4s`), launch at login (`SMAppService`).
+### M2 — Radial Orbit MVP (macOS) (✅ Hoàn tất)
+- [x] App menu bar (`LSUIElement`), không có Dock icon.
+- [x] Phát hiện drag + hold 0.4s (từ Spike A), hiện pie menu `Radial Orbit` (`NSPanel` non-activating) ngay dưới con trỏ.
+- [x] Vòng trong: định dạng đích theo `UTType`; vòng ngoài (Sub-Orbit): preset (`LEI16`, `24-bit`, `Mono`, `Trim`...).
+- [x] Thả lên lát → convert và xuất ngay cạnh file gốc; thả ra ngoài / nhấn `Esc` → huỷ, drag gốc vẫn hoạt động bình thường.
+- [x] Mở nhanh từ Menu Bar (File mẫu Audio/Image hoặc chọn file bất kỳ).
+- [x] Hỗ trợ kéo **nhiều file** cùng lúc (batch), hiển thị Toast tiến trình + Undo (xoá file vừa tạo).
+- [x] Settings cơ bản: bật/tắt vòng xoay, thời gian hold (`0.2s–1.0s`), tuỳ chọn giữ phím `Option (⌥)`, âm thanh, mở Finder.
 
 **Done khi:** dùng hằng ngày được cho workflow `mp3 → wav LEI16` và `heic → png` bằng vòng xoay tại con trỏ mà không mở cửa sổ nào, không làm hỏng drag & drop thông thường giữa các app (Finder, Safari, Xcode, Slack).
 

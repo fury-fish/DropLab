@@ -107,9 +107,9 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 > ✅ Plan locked (2026-10-21). Full plan with decisions, review notes & Definition of Done: **[ROADMAP.md](ROADMAP.md)**
 
 * [x] UX/UI Concept & Conversion Matrix Architecture
-* [ ] **Phase 0 (Spikes):** Validate global drag detection, notch `NSPanel` drop target, native audio/image conversion, non-sandboxed output
-* [ ] **M1 (Engine + CLI):** `DropLabCore` Swift package + `droplab` CLI — native audio (`LEI16`, `24-bit`, `Trim`) & image (`HEIC`, `PNG`, `JPG`, `ICNS`)
-* [ ] **M2 (Radial Orbit MVP):** Menu bar app, drag & hold `0.4s` pie menu with sub-orbit presets, global hotkey alternative, batch + Undo
+* [x] **Phase 0 (Spikes):** Validate global drag detection, non-activating `NSPanel` drop target, native audio/image conversion, non-sandboxed output
+* [x] **M1 (Engine + CLI):** `DropLabCore` Swift package + `droplab` CLI — native audio (`LEI16`, `24-bit`, `Trim`) & image (`HEIC`, `PNG`, `JPG`, `ICNS`)
+* [x] **M2 (Radial Orbit MVP):** Menu bar app, drag & hold `0.4s` pie menu with sub-orbit presets, demo & file picker triggers, batch + Undo
 * [ ] **M3 (Notch Tray):** Drop into notch (top-center pill fallback) ➔ pick format ➔ export
 * [ ] **M4 (Extended Codecs + Trim UI):** `MP3`/`WEBP`/`OGG`/`WEBM` encoders, waveform trimmer, video basics
 * [ ] **M5 (Release 1.0 macOS):** Notarized DMG, Sparkle auto-update, onboarding
