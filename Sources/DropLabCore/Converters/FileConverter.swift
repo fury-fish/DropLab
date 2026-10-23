@@ -2,6 +2,7 @@ import Foundation
 
 public enum DropLabError: LocalizedError, Sendable {
     case fileNotFound(URL)
+    case permissionDenied(URL)
     case unsupportedInput(URL)
     case unsupportedConversion(from: String, to: TargetFormat)
     case readerInitializationFailed(String)
@@ -11,17 +12,20 @@ public enum DropLabError: LocalizedError, Sendable {
     public var errorDescription: String? {
         switch self {
         case .fileNotFound(let url):
-            return "File not found: \(url.lastPathComponent)"
+            return "Không tìm thấy file: \(url.lastPathComponent)"
+        case .permissionDenied(let url):
+            let folder = url.deletingLastPathComponent().lastPathComponent
+            return "Không có quyền đọc file '\(url.lastPathComponent)' trong '\(folder)'. Hãy mở DropLab.app trực tiếp từ /Applications."
         case .unsupportedInput(let url):
-            return "Unsupported input format: \(url.lastPathComponent)"
+            return "Định dạng đầu vào chưa hỗ trợ: \(url.lastPathComponent)"
         case .unsupportedConversion(let from, let to):
-            return "Unsupported conversion from .\(from) to .\(to.rawValue)"
+            return "Chưa hỗ trợ chuyển từ .\(from) sang .\(to.rawValue)"
         case .readerInitializationFailed(let detail):
-            return "Failed to read input media: \(detail)"
+            return "Không đọc được dữ liệu media: \(detail)"
         case .writerInitializationFailed(let detail):
-            return "Failed to initialize output writer: \(detail)"
+            return "Không tạo được file xuất: \(detail)"
         case .conversionFailed(let detail):
-            return "Conversion failed: \(detail)"
+            return "Lỗi chuyển đổi: \(detail)"
         }
     }
 }

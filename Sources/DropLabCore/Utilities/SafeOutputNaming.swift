@@ -7,7 +7,16 @@ public enum SafeOutputNaming {
         options: ConversionOptions,
         fileManager: FileManager = .default
     ) -> URL {
-        let directory = options.outputDirectory ?? sourceURL.deletingLastPathComponent()
+        let preferredDir = options.outputDirectory ?? sourceURL.deletingLastPathComponent()
+        let directory: URL
+        if fileManager.isWritableFile(atPath: preferredDir.path) {
+            directory = preferredDir
+        } else if let downloads = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask).first,
+                  fileManager.isWritableFile(atPath: downloads.path) {
+            directory = downloads
+        } else {
+            directory = URL(fileURLWithPath: NSTemporaryDirectory())
+        }
         let baseName = sourceURL.deletingPathExtension().lastPathComponent
         let targetExt = options.targetFormat.fileExtension
 

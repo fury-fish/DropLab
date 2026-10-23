@@ -19,15 +19,19 @@ public final class DropLabEngine: Sendable {
         at sourceURL: URL,
         options: ConversionOptions
     ) async throws -> ConversionResult {
-        let didStartAccessing = sourceURL.startAccessingSecurityScopedResource()
+        let resolvedSource = (sourceURL as NSURL).filePathURL ?? sourceURL
+        let hasScope = resolvedSource.startAccessingSecurityScopedResource()
         defer {
-            if didStartAccessing {
-                sourceURL.stopAccessingSecurityScopedResource()
+            if hasScope {
+                resolvedSource.stopAccessingSecurityScopedResource()
             }
         }
 
-        guard FileManager.default.fileExists(atPath: sourceURL.path) else {
-            throw DropLabError.fileNotFound(sourceURL)
+        guard FileManager.default.fileExists(atPath: resolvedSource.path) else {
+            throw DropLabError.fileNotFound(resolvedSource)
+        }
+        guard FileManager.default.isReadableFile(atPath: resolvedSource.path) else {
+            throw DropLabError.permissionDenied(resolvedSource)
         }
 
         if let outDir = options.outputDirectory {
@@ -35,16 +39,16 @@ public final class DropLabEngine: Sendable {
         }
 
         let startTime = DispatchTime.now()
-        let outputURL = SafeOutputNaming.makeOutputURL(for: sourceURL, options: options)
-        let converter = try selectConverter(for: sourceURL, targetFormat: options.targetFormat)
+        let outputURL = SafeOutputNaming.makeOutputURL(for: resolvedSource, options: options)
+        let converter = try selectConverter(for: resolvedSource, targetFormat: options.targetFormat)
 
-        try await converter.convert(sourceURL: sourceURL, to: outputURL, options: options)
+        try await converter.convert(sourceURL: resolvedSource, to: outputURL, options: options)
 
         let elapsedNano = DispatchTime.now().uptimeNanoseconds - startTime.uptimeNanoseconds
         let elapsedMs = max(1, Int(elapsedNano / 1_000_000))
 
         return ConversionResult(
-            sourceURL: sourceURL,
+            sourceURL: resolvedSource,
             outputURL: outputURL,
             targetFormat: options.targetFormat,
             preset: options.preset,

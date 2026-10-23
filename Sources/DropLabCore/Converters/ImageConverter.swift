@@ -6,12 +6,20 @@ import ImageIO
 import UniformTypeIdentifiers
 import PDFKit
 
-/// Native hardware-accelerated Image & Icon converter built on ImageIO & CoreGraphics.
+/// Native hardware-accelerated Image & Icon converter built on ImageIO, CoreImage & CoreGraphics.
 public struct ImageConverter: FileConverter {
     public init() {}
 
     public func convert(sourceURL: URL, to outputURL: URL, options: ConversionOptions) async throws {
-        let baseImage = try loadCGImage(from: sourceURL)
+        let resolvedSource = (sourceURL as NSURL).filePathURL ?? sourceURL
+        let hasScope = resolvedSource.startAccessingSecurityScopedResource()
+        defer {
+            if hasScope {
+                resolvedSource.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        let baseImage = try loadCGImage(from: resolvedSource)
 
         let scaleFactor: CGFloat
         switch options.preset {
@@ -38,8 +46,9 @@ public struct ImageConverter: FileConverter {
         }
 
         let destinationTypeIdentifier = try utTypeIdentifier(for: options.targetFormat)
-        guard let destination = CGImageDestinationCreateWithURL(
-            outputURL as CFURL,
+        let outData = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(
+            outData as CFMutableData,
             destinationTypeIdentifier as CFString,
             1,
             nil
@@ -58,20 +67,41 @@ public struct ImageConverter: FileConverter {
 
         CGImageDestinationAddImage(destination, processedImage, properties as CFDictionary)
         guard CGImageDestinationFinalize(destination) else {
-            throw DropLabError.conversionFailed("Failed to finalize image output \(outputURL.lastPathComponent)")
+            throw DropLabError.conversionFailed("Failed to encode image to .\(options.targetFormat.rawValue)")
+        }
+
+        do {
+            try (outData as Data).write(to: outputURL, options: .atomic)
+        } catch {
+            throw DropLabError.writerInitializationFailed(error.localizedDescription)
         }
     }
 
     private func loadCGImage(from url: URL) throws -> CGImage {
+        // Verify read access explicitly so sandbox / TCC permission errors are reported clearly
+        let fileData: Data
+        do {
+            fileData = try Data(contentsOf: url, options: .mappedIfSafe)
+        } catch let nsError as NSError {
+            if nsError.domain == NSCocoaErrorDomain && nsError.code == NSFileReadNoPermissionError {
+                throw DropLabError.permissionDenied(url)
+            }
+            if nsError.domain == NSPOSIXErrorDomain && (nsError.code == Int(EPERM) || nsError.code == Int(EACCES)) {
+                throw DropLabError.permissionDenied(url)
+            }
+            throw DropLabError.readerInitializationFailed(nsError.localizedDescription)
+        }
+
+        // 1. PDF first-page rasterizer
         if url.pathExtension.lowercased() == "pdf",
-           let pdfDoc = PDFDocument(url: url),
+           let pdfDoc = PDFDocument(data: fileData),
            let firstPage = pdfDoc.page(at: 0) {
             let pageRect = firstPage.bounds(for: .mediaBox)
             let renderScale: CGFloat = 2.0
             let width = max(1, Int(pageRect.width * renderScale))
             let height = max(1, Int(pageRect.height * renderScale))
             let colorSpace = CGColorSpaceCreateDeviceRGB()
-            guard let ctx = CGContext(
+            if let ctx = CGContext(
                 data: nil,
                 width: width,
                 height: height,
@@ -79,37 +109,34 @@ public struct ImageConverter: FileConverter {
                 bytesPerRow: 0,
                 space: colorSpace,
                 bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-            ) else {
-                throw DropLabError.readerInitializationFailed("Cannot allocate PDF render context")
-            }
-            ctx.setFillColor(CGColor(red: 1, green: 1, blue: 1, alpha: 1))
-            ctx.fill(CGRect(x: 0, y: 0, width: width, height: height))
-            ctx.scaleBy(x: renderScale, y: renderScale)
-            firstPage.draw(with: .mediaBox, to: ctx)
-            if let rendered = ctx.makeImage() {
-                return rendered
+            ) {
+                ctx.setFillColor(CGColor(red: 1, green: 1, blue: 1, alpha: 1))
+                ctx.fill(CGRect(x: 0, y: 0, width: width, height: height))
+                ctx.scaleBy(x: renderScale, y: renderScale)
+                firstPage.draw(with: .mediaBox, to: ctx)
+                if let rendered = ctx.makeImage() {
+                    return rendered
+                }
             }
         }
 
-        if let source = CGImageSourceCreateWithURL(url as CFURL, nil),
-           let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) {
+        // 2. Primary ImageIO decoder from Data (auto-applies EXIF orientation via thumbnail/options if needed)
+        let sourceOptions: [CFString: Any] = [kCGImageSourceShouldCache: true]
+        if let source = CGImageSourceCreateWithData(fileData as CFData, sourceOptions as CFDictionary),
+           let cgImage = CGImageSourceCreateImageAtIndex(source, 0, sourceOptions as CFDictionary) {
             return cgImage
         }
 
-        if let data = try? Data(contentsOf: url),
-           let source = CGImageSourceCreateWithData(data as CFData, nil),
-           let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) {
-            return cgImage
-        }
-
-        if let ciImage = CIImage(contentsOf: url) {
-            let ciContext = CIContext(options: nil)
+        // 3. CoreImage fallback (handles CMYK JPEGs, HDR gain-map JPEGs, WebP/AVIF misnamed as .JPG, RAW)
+        if let ciImage = CIImage(data: fileData, options: [.applyOrientationProperty: true]) {
+            let ciContext = CIContext(options: [.useSoftwareRenderer: false])
             if let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) {
                 return cgImage
             }
         }
 
-        if let nsImage = NSImage(contentsOf: url) {
+        // 4. AppKit NSImage fallback (handles SVG vectors, EPS, ICNS)
+        if let nsImage = NSImage(data: fileData) ?? NSImage(contentsOf: url) {
             var rect = CGRect(
                 x: 0,
                 y: 0,
@@ -121,10 +148,6 @@ public struct ImageConverter: FileConverter {
             }
         }
 
-        if !FileManager.default.isReadableFile(atPath: url.path) {
-            throw DropLabError.readerInitializationFailed("macOS blocked access to \(url.lastPathComponent). Please grant Files & Folders access to DropLab.")
-        }
-
         throw DropLabError.readerInitializationFailed("Cannot decode image from \(url.lastPathComponent)")
     }
 
@@ -133,10 +156,6 @@ public struct ImageConverter: FileConverter {
         scale: CGFloat,
         removeAlpha: Bool
     ) throws -> CGImage {
-        if abs(scale - 1.0) < 0.001 && !removeAlpha {
-            return image
-        }
-
         let targetWidth = max(1, Int((CGFloat(image.width) * scale).rounded()))
         let targetHeight = max(1, Int((CGFloat(image.height) * scale).rounded()))
         let colorSpace = CGColorSpaceCreateDeviceRGB()
@@ -172,8 +191,9 @@ public struct ImageConverter: FileConverter {
 
     private func writeICNS(from image: CGImage, to outputURL: URL) throws {
         let sizes = [16, 32, 64, 128, 256, 512, 1024]
-        guard let destination = CGImageDestinationCreateWithURL(
-            outputURL as CFURL,
+        let outData = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(
+            outData as CFMutableData,
             "com.apple.icns" as CFString,
             sizes.count,
             nil
@@ -202,11 +222,13 @@ public struct ImageConverter: FileConverter {
         guard CGImageDestinationFinalize(destination) else {
             throw DropLabError.conversionFailed("Failed to finalize .icns file")
         }
+        try (outData as Data).write(to: outputURL, options: .atomic)
     }
 
     private func writeImageAsPDF(_ image: CGImage, to outputURL: URL) throws {
         var mediaBox = CGRect(x: 0, y: 0, width: image.width, height: image.height)
-        guard let consumer = CGDataConsumer(url: outputURL as CFURL),
+        let outData = NSMutableData()
+        guard let consumer = CGDataConsumer(data: outData as CFMutableData),
               let pdfContext = CGContext(consumer: consumer, mediaBox: &mediaBox, nil) else {
             throw DropLabError.writerInitializationFailed("Cannot create PDF context")
         }
@@ -214,6 +236,7 @@ public struct ImageConverter: FileConverter {
         pdfContext.draw(image, in: mediaBox)
         pdfContext.endPDFPage()
         pdfContext.closePDF()
+        try (outData as Data).write(to: outputURL, options: .atomic)
     }
 
     private func utTypeIdentifier(for format: TargetFormat) throws -> String {

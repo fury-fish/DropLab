@@ -56,6 +56,12 @@ cat > "$CONTENTS_DIR/Info.plist" << 'EOF'
     <true/>
     <key>NSAppleEventsUsageDescription</key>
     <string>DropLab cần quyền đọc file đang chọn trong Finder để mở nhanh Vòng Xoay Trọng Lực.</string>
+    <key>NSDownloadsFolderUsageDescription</key>
+    <string>DropLab cần quyền đọc và xuất file chuyển đổi trong thư mục Downloads của bạn.</string>
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>DropLab cần quyền đọc và xuất file chuyển đổi trên Desktop của bạn.</string>
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>DropLab cần quyền đọc và xuất file chuyển đổi trong thư mục Documents của bạn.</string>
 </dict>
 </plist>
 EOF
