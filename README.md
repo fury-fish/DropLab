@@ -104,7 +104,7 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 
 ## 🗺️ Roadmap / Lộ trình Phát triển
 
-> 🎉 **Phase 1 (macOS v1.0.0) Completed!** Full Phase 2 plan (`M6 ➔ M9`): **[ROADMAP.md](ROADMAP.md)**
+> 🎉 **Phase 1 & Phase 2 (macOS v2.0.0) Completed!** Full details: **[ROADMAP.md](ROADMAP.md)**
 
 * [x] UX/UI Concept & Conversion Matrix Architecture
 * [x] **Phase 0 (Spikes):** Validate global drag detection, non-activating `NSPanel` drop target, native audio/image conversion, non-sandboxed output
@@ -113,10 +113,10 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 * [x] **M3 (Notch Tray + Waveform Trimmer):** Drop into notch (top-center pill fallback) ➔ Trackpad scroll / arrow keys format picker + inline waveform trimmer with live audio preview ➔ export
 * [x] **M4 (Extended Codecs + Video/PDF Tools):** `MP3`/`WEBP`/`OGG`/`FLAC`/`WEBM` encoders, native `Video ➔ Animated GIF`, PDF Merge & Split
 * [x] **M5 (Release 1.0 macOS):** Signed `DropLab.app` v1.0.0 bundle with custom `AppIcon.icns`, `SMAppService` Launch at Login, Finder selection trigger, and Third-Party Licenses About panel
-* [ ] **M6 (UX Polish & Haptics — v1.1):** Center-hub & floating HUD preset callout (prevent Finder drag-thumbnail occlusion), Force Touch trackpad haptics, system-wide `⌥Space` hotkey
-* [ ] **M7 (Developer & Designer Tools — v1.2):** Xcode `.appiconset` generator, smart PDF compression, `SVG ➔ SwiftUI Shape` code generator, SpriteSheet packer
-* [ ] **M8 (On-Device Apple Silicon AI — v1.3):** 1-drop Background Removal (`Vision`), OCR Image/PDF ➔ `.txt`/`.md`, Audio/Video ➔ `.srt` subtitles (`Speech`)
-* [ ] **M9 (Notch Drag-Out Shelf & Extensions — v2.0):** Drag converted files straight out of the Notch into Slack/Xcode, Finder Quick Action extension, optional iOS/iPadOS companion
+* [x] **M6 (UX Polish & Haptics — v1.1):** Center-hub & floating HUD preset callout (prevent Finder drag-thumbnail occlusion), Force Touch trackpad haptics, system-wide `⌥Space` hotkey
+* [x] **M7 (Developer & Designer Tools — v1.2):** Xcode `.appiconset` generator, smart PDF compression, `SVG ➔ SwiftUI Shape` code generator, SpriteSheet packer (`.png` + `.json` atlas)
+* [x] **M8 (On-Device Apple Silicon AI — v1.3):** 1-drop Background Removal (`Vision`), OCR Image/PDF ➔ `.txt`, Audio/Video ➔ `.srt` subtitles (`Speech`)
+* [x] **M9 (Notch Drag-Out Shelf & Finder Integration — v2.0):** Drag converted files straight out of the Notch into Slack/Xcode, Finder "Open With" & macOS System Services integration
 
 ---
 

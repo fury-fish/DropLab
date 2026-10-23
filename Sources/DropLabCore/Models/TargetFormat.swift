@@ -26,9 +26,11 @@ public enum TargetFormat: String, Codable, CaseIterable, Identifiable, Sendable 
     case mov
     case webm
 
-    // Document / Data
+    // Document / Data / Dev
     case pdf
     case txt
+    case srt
+    case swift
     case json
     case plist
     case csv
@@ -52,9 +54,9 @@ public enum TargetFormat: String, Codable, CaseIterable, Identifiable, Sendable 
             return .image
         case .mp4, .mov, .webm:
             return .video
-        case .pdf, .txt:
+        case .pdf, .txt, .srt:
             return .document
-        case .json, .plist, .csv, .tsv:
+        case .swift, .json, .plist, .csv, .tsv:
             return .data
         }
     }
@@ -73,6 +75,10 @@ public enum TargetFormat: String, Codable, CaseIterable, Identifiable, Sendable 
             return "doc.richtext"
         case .txt:
             return "doc.text.viewfinder"
+        case .srt:
+            return "captions.bubble"
+        case .swift:
+            return "swift"
         case .json, .plist:
             return "curlybraces"
         case .csv, .tsv:

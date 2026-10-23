@@ -8,6 +8,7 @@ public enum NotchTrayMode: Equatable, Sendable {
     case hidden
     case dropTargetReady
     case expanded
+    case outputShelf
 }
 
 @MainActor
@@ -19,6 +20,7 @@ public final class NotchTrayViewModel: ObservableObject {
     @Published public var slices: [OrbitSliceSpec] = []
     @Published public var selectedSliceIndex: Int = 0
     @Published public var selectedPresetIndex: Int = 0
+    @Published public var completedResults: [ConversionResult] = []
 
     // Inline Waveform Trimmer state (for Audio & Video files)
     @Published public var waveform: WaveformSummary? = nil
@@ -86,6 +88,9 @@ public final class NotchTrayViewModel: ObservableObject {
 
     public func selectSlice(at index: Int) {
         guard slices.indices.contains(index) else { return }
+        if selectedSliceIndex != index {
+            HapticEngine.sliceChanged()
+        }
         selectedSliceIndex = index
         selectedPresetIndex = 0
     }

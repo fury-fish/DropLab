@@ -52,6 +52,11 @@ public struct ImageConverter: FileConverter {
             return
         }
 
+        if options.targetFormat == .png && options.preset == .spriteSheet {
+            try SpriteSheetGenerator.generateSpriteSheet(from: [resolvedSource], to: outputURL)
+            return
+        }
+
         let destinationTypeIdentifier = try utTypeIdentifier(for: options.targetFormat)
         let outData = NSMutableData()
         guard let destination = CGImageDestinationCreateWithData(

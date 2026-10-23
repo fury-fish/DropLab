@@ -28,6 +28,7 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
         GlobalDragMonitor.shared.start()
+        NSApp.servicesProvider = self
 
         GlobalHotkeyManager.shared.onHotkeyPressed = { [weak self] in
             if RadialOrbitController.shared.isPresented {
@@ -299,6 +300,36 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
             return CGPoint(x: screen.frame.midX, y: screen.frame.midY)
         }
         return NSEvent.mouseLocation
+    }
+
+    // MARK: - Finder "Open With" & macOS System Services Integration (M9)
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        let resolved = urls.map { ($0 as NSURL).filePathURL ?? $0 }
+        guard !resolved.isEmpty else { return }
+        RadialOrbitController.shared.present(
+            for: resolved,
+            at: NSEvent.mouseLocation,
+            duringActiveDrag: false
+        )
+    }
+
+    @objc func handleFinderService(
+        _ pboard: NSPasteboard,
+        userData: String?,
+        error: AutoreleasingUnsafeMutablePointer<NSString?>
+    ) {
+        let opts: [NSPasteboard.ReadingOptionKey: Any] = [.urlReadingFileURLsOnly: true]
+        guard let urls = pboard.readObjects(forClasses: [NSURL.self], options: opts) as? [URL],
+              !urls.isEmpty else {
+            return
+        }
+        let resolved = urls.map { ($0 as NSURL).filePathURL ?? $0 }
+        RadialOrbitController.shared.present(
+            for: resolved,
+            at: NSEvent.mouseLocation,
+            duringActiveDrag: false
+        )
     }
 }
 

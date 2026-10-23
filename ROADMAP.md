@@ -1,7 +1,6 @@
 # 🗺️ DropLab — Roadmap & Phase 2 Plan
 
-> **Trạng thái hiện tại:** 🎉 Đã hoàn thành toàn bộ lộ trình **Phase 1 — macOS v1.0.0** (`Phase 0`, `M1`, `M2`, `M3`, `M4`, `M5`) và bản vá quyền truy cập file thực tế (`109451c`).
-> **Bước tiếp theo:** **Phase 2 (M6 ➔ M9)** — Tinh chỉnh UX thực chiến, công cụ cho Developer/Designer, và AI cục bộ trên Apple Silicon (`Vision` / `Speech`).
+> **Trạng thái hiện tại:** 🎉 Đã hoàn thành toàn bộ lộ trình **Phase 1 (macOS v1.0.0)** và **Phase 2 (macOS v2.0.0: `M6`, `M7`, `M8`, `M9`)** với `9/9` unit tests pass 100%!
 
 ---
 
@@ -54,29 +53,27 @@ flowchart LR
 - [x] **Phím tắt toàn cục cấp hệ thống (Global Hotkey `⌥Space`):**
   - Đăng ký phím tắt toàn cục (`Carbon RegisterEventHotKey`) để khi đang chọn file trong Finder, chỉ cần bấm `⌥Space` là Vòng Xoay bung ngay tại con trỏ chuột mà không cần kéo.
 
-### 🛠️ M7 — Công cụ Chuyên sâu cho Developer & Designer (v1.2 — ✅ Đã hoàn thành cốt lõi)
+### 🛠️ M7 — Công cụ Chuyên sâu cho Developer & Designer (v1.2 — ✅ Đã hoàn thành)
 - [x] **Xcode `.appiconset` Generator:**
   - Kéo 1 ảnh gốc (`1024x1024.png`) ➔ chọn `ICNS -> .appiconset` ➔ xuất trọn bộ thư mục `AppIcon.appiconset` (đầy đủ mọi kích thước macOS + `Contents.json` chuẩn Xcode).
 - [x] **Nén PDF thông minh (`Compress PDF`):**
   - Nén dung lượng file PDF nặng (tái nén trang ảnh nhúng trong PDF bằng Quartz / ImageIO) giảm mạnh dung lượng.
-- [ ] **SVG ➔ SwiftUI `Shape` Code:**
-  - Kéo file vector `.svg` ➔ sinh ra file `.swift` chứa `struct CustomShape: Shape` (hoặc copy thẳng code SwiftUI vào Clipboard).
-- [ ] **SpriteSheet Generator:**
-  - Kéo nhiều ảnh frame `.png` ➔ ghép thành 1 tấm `spritesheet.png` + file metadata `.json`.
+- [x] **SVG / Image ➔ SwiftUI `Shape` Code (`SwiftShapeConverter`):**
+  - Kéo file vector `.svg` (hoặc ảnh) ➔ chọn `SWIFT` ➔ sinh ra file `.swift` chứa `struct CustomShape: Shape` chuẩn tỉ lệ `[0, 1]` kèm `#Preview`.
+- [x] **SpriteSheet Generator (`SpriteSheetGenerator`):**
+  - Kéo nhiều ảnh frame `.png` ➔ chọn `PNG -> SpriteSheet` ➔ ghép thành 1 tấm `*_spritesheet.png` + file atlas metadata `*_spritesheet.json`.
 
-### 🧠 M8 — On-Device Apple Silicon AI (v1.3 — 100% Offline & Miễn phí — ✅ Đã hoàn thành cốt lõi)
+### 🧠 M8 — On-Device Apple Silicon AI (v1.3 — 100% Offline & Miễn phí — ✅ Đã hoàn thành)
 *Tận dụng sẵn Neural Engine thông qua framework `Vision` và `Speech` có sẵn trên macOS 14+:*
 - [x] **Tách nền ảnh 1 chạm (`PNG -> Tách nền AI`):**
   - Dùng `VNGenerateForegroundInstanceMaskRequest` (`Vision` framework) để tách nền chủ thể ra khỏi ảnh `.jpg`/`.png`/`.heic` và xuất ra `.png` nền trong suốt ngay tại chỗ.
 - [x] **OCR Trích xuất văn bản (`Image / PDF -> TXT`):**
   - Dùng `VNRecognizeTextRequest` đọc chữ từ ảnh chụp màn hình hoặc PDF scan ra file `.txt`.
-- [ ] **Audio / Video ➔ Phụ đề `.srt` & `.txt`:**
-  - Dùng `SFSpeechRecognizer` (hoặc `whisper.cpp` nếu có) để chép lời file ghi âm/video thành phụ đề `.srt`.
+- [x] **Audio / Video ➔ Phụ đề `.srt` (`SpeechAIConverter`):**
+  - Dùng `SFSpeechRecognizer` trên thiết bị (kèm bộ phân đoạn âm thanh dự phòng) để tạo file phụ đề SubRip `.srt`.
 
-### 🏝️ M9 — Khay Kéo-Ra ở Tai Thỏ (Notch Output Shelf) & Tiện ích Mở rộng (v2.0)
-- [ ] **Notch Output Drag-Out Shelf:**
-  - Sau khi chuyển đổi xong trong Lò Luyện Tai Thỏ, giữ icon file kết quả trên khay để bạn **kéo trực tiếp file mới từ Tai Thỏ thả thẳng vào khung chat Slack, Telegram, trình duyệt hoặc Xcode**.
-- [ ] **Finder Quick Action Extension:**
-  - Tích hợp vào menu chuột phải `Quick Actions` của Finder.
-- [ ] **iOS / iPadOS Companion (Phụ, tuỳ chọn):**
-  - Share/Action Extension + Shortcuts App Intents tái sử dụng `DropLabCore`.
+### 🏝️ M9 — Khay Kéo-Ra ở Tai Thỏ (Notch Output Shelf) & Tiện ích Mở rộng (v2.0 — ✅ Đã hoàn thành)
+- [x] **Notch Output Drag-Out Shelf (`NotchTrayMode.outputShelf`):**
+  - Sau khi chuyển đổi xong trong Lò Luyện Tai Thỏ, khay tự chuyển sang **Notch Output Shelf** giữ thẻ file kết quả để bạn **kéo trực tiếp file mới từ Tai Thỏ thả thẳng vào khung chat Slack, Telegram, trình duyệt hoặc Xcode**, hoặc bấm `Copy File` / `Mở Finder`.
+- [x] **Finder "Open With" & macOS System Services (`NSServices`):**
+  - Tích hợp vào menu chuột phải `Open With -> DropLab` và `Services -> Mở bằng Vòng Xoay DropLab` của Finder.

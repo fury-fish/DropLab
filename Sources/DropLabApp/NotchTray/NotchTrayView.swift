@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import DropLabCore
 
@@ -19,6 +20,9 @@ public struct NotchTrayView: View {
             } else if viewModel.mode == .expanded {
                 expandedTrayView
                     .transition(.scale(scale: 0.92, anchor: .top).combined(with: .opacity))
+            } else if viewModel.mode == .outputShelf {
+                outputShelfView
+                    .transition(.scale(scale: 0.94, anchor: .top).combined(with: .opacity))
             }
             Spacer(minLength: 0)
         }
@@ -294,6 +298,146 @@ public struct NotchTrayView: View {
             }
             .buttonStyle(.plain)
         }
+    }
+
+    // MARK: - M9 Notch Output Drag-Out Shelf
+
+    private var outputShelfView: some View {
+        let firstResult = viewModel.completedResults.first
+
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(Color.green)
+                Text("Đã luyện xong! Kéo thẻ file bên dưới thả thẳng vào App bất kỳ:")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.9))
+                Spacer()
+                if let firstResult {
+                    Text("\(firstResult.elapsedMilliseconds)ms")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .foregroundStyle(Color.green.opacity(0.85))
+                }
+            }
+
+            if let firstResult {
+                HStack(spacing: 12) {
+                    Image(nsImage: NSWorkspace.shared.icon(forFile: firstResult.outputURL.path))
+                        .resizable()
+                        .frame(width: 34, height: 34)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(firstResult.outputURL.lastPathComponent)
+                            .font(.system(size: 13.5, weight: .bold, design: .monospaced))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        Text(firstResult.outputURL.deletingLastPathComponent().path)
+                            .font(.system(size: 10.5))
+                            .foregroundStyle(.white.opacity(0.55))
+                            .lineLimit(1)
+                            .truncationMode(.head)
+                    }
+
+                    Spacer()
+
+                    HStack(spacing: 5) {
+                        Image(systemName: "hand.draw.fill")
+                            .font(.system(size: 12, weight: .bold))
+                        Text("Kéo thả từ đây")
+                            .font(.system(size: 11.5, weight: .bold))
+                    }
+                    .foregroundStyle(Color.orange)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(Color.orange.opacity(0.16))
+                            .overlay(Capsule().stroke(Color.orange.opacity(0.6), lineWidth: 1))
+                    )
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color.white.opacity(0.08))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(Color.green.opacity(0.55), lineWidth: 1.3)
+                        )
+                )
+                .onDrag {
+                    NSItemProvider(object: firstResult.outputURL as NSURL)
+                }
+            }
+
+            HStack(spacing: 10) {
+                Button {
+                    let pb = NSPasteboard.general
+                    pb.clearContents()
+                    pb.writeObjects(viewModel.completedResults.map { $0.outputURL as NSURL })
+                } label: {
+                    Label("Copy File", systemImage: "doc.on.doc")
+                        .font(.system(size: 11.5, weight: .semibold))
+                        .foregroundStyle(Color.cyan)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Capsule().fill(Color.cyan.opacity(0.15)))
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    NSWorkspace.shared.activateFileViewerSelecting(viewModel.completedResults.map(\.outputURL))
+                } label: {
+                    Label("Mở Finder", systemImage: "folder")
+                        .font(.system(size: 11.5, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Capsule().fill(Color.white.opacity(0.12)))
+                }
+                .buttonStyle(.plain)
+
+                Spacer()
+
+                Button {
+                    viewModel.onClose?()
+                } label: {
+                    Text("Đóng (Esc)")
+                        .font(.system(size: 11.5, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.75))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Capsule().fill(Color.white.opacity(0.08)))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 14)
+        .frame(width: 536)
+        .background(
+            UnevenRoundedRectangle(
+                topLeadingRadius: 6,
+                bottomLeadingRadius: 24,
+                bottomTrailingRadius: 24,
+                topTrailingRadius: 6,
+                style: .continuous
+            )
+            .fill(Color(red: 0.05, green: 0.07, blue: 0.10).opacity(0.98))
+            .overlay(
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 6,
+                    bottomLeadingRadius: 24,
+                    bottomTrailingRadius: 24,
+                    topTrailingRadius: 6,
+                    style: .continuous
+                )
+                .stroke(Color.green.opacity(0.45), lineWidth: 1.3)
+            )
+            .shadow(color: Color.black.opacity(0.55), radius: 18, y: 8)
+        )
     }
 }
 

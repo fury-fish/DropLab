@@ -24,12 +24,12 @@ public final class NotchTrayController: ObservableObject {
     }
 
     public var isExpanded: Bool {
-        viewModel.mode == .expanded
+        viewModel.mode == .expanded || viewModel.mode == .outputShelf
     }
 
     public func showDropTargetPill() {
         guard AppSettings.shared.notchTrayEnabled else { return }
-        guard viewModel.mode != .expanded else { return }
+        guard !isExpanded else { return }
         ensurePanelPositionedAtTopCenter()
         viewModel.mode = .dropTargetReady
         panel?.orderFrontRegardless()
@@ -84,7 +84,14 @@ public final class NotchTrayController: ObservableObject {
     private func installKeyboardShortcutsMonitor() {
         removeKeyboardShortcutsMonitor()
         localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            guard let self, self.viewModel.mode == .expanded else { return event }
+            guard let self, self.isExpanded else { return event }
+            if self.viewModel.mode == .outputShelf {
+                if event.keyCode == 53 { // Esc
+                    self.dismiss()
+                    return nil
+                }
+                return event
+            }
             switch event.keyCode {
             case 53: // Esc
                 self.dismiss()
@@ -121,20 +128,20 @@ public final class NotchTrayController: ObservableObject {
 
     private func executeConversion(options: ConversionOptions) {
         let urls = viewModel.sourceURLs
-        dismiss()
+        viewModel.stopPreview()
 
         Task { @MainActor in
             do {
                 let results = try await DropLabEngine.shared.convertBatch(urls: urls, options: options)
+                HapticEngine.conversionCompleted()
                 if AppSettings.shared.playSoundOnConvert {
                     NSSound(named: NSSound.Name("Glass"))?.play()
                 }
-                if AppSettings.shared.revealInFinderAfterConvert {
-                    NSWorkspace.shared.activateFileViewerSelecting(results.map(\.outputURL))
-                }
-                ConversionToastController.shared.showSuccess(results: results)
+                self.viewModel.completedResults = results
+                self.viewModel.mode = .outputShelf
             } catch {
                 NSSound.beep()
+                self.dismiss()
                 ConversionToastController.shared.showError(error.localizedDescription)
             }
         }

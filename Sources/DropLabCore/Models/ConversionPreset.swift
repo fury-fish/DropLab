@@ -18,6 +18,7 @@ public enum ConversionPreset: String, Codable, CaseIterable, Identifiable, Senda
     case quality80 = "quality80"
     case removeAlpha = "noalpha"
     case appIconSet = "appiconset"
+    case spriteSheet = "spritesheet"
 
     // Video & GIF presets
     case muteAudio = "mute"
@@ -51,6 +52,7 @@ public enum ConversionPreset: String, Codable, CaseIterable, Identifiable, Senda
         case .quality80: return "80% Qual"
         case .removeAlpha: return "No Alpha"
         case .appIconSet: return ".appiconset"
+        case .spriteSheet: return "SpriteSheet"
         case .muteAudio: return "Tắt tiếng"
         case .fps15: return "15 FPS"
         case .mergePDF: return "Gộp PDF"
@@ -78,6 +80,7 @@ public enum ConversionPreset: String, Codable, CaseIterable, Identifiable, Senda
         case .quality80: return "q80"
         case .removeAlpha: return "opaque"
         case .appIconSet: return "AppIcon"
+        case .spriteSheet: return "spritesheet"
         case .muteAudio: return "muted"
         case .fps15: return "15fps"
         case .mergePDF: return "merged"

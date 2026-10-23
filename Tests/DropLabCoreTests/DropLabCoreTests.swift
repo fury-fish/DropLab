@@ -25,7 +25,7 @@ final class DropLabCoreTests: XCTestCase {
         XCTAssertEqual(FileCategory.detect(for: mp3URL), .audio)
 
         let audioSlices = ConversionRegistry().orbitSlices(for: mp3URL)
-        XCTAssertEqual(audioSlices.map(\.targetFormat), [.wav, .caf, .m4a, .mp3, .ogg, .flac])
+        XCTAssertEqual(audioSlices.map(\.targetFormat), [.wav, .caf, .m4a, .mp3, .ogg, .flac, .srt])
         XCTAssertTrue(audioSlices[0].subOrbitPresets.contains(.lei16))
         XCTAssertTrue(audioSlices[0].subOrbitPresets.contains(.pcm24))
         XCTAssertTrue(audioSlices[0].subOrbitPresets.contains(.trim8s))
@@ -211,6 +211,55 @@ final class DropLabCoreTests: XCTestCase {
             options: ConversionOptions(targetFormat: .txt, preset: .standard)
         )
         XCTAssertTrue(FileManager.default.fileExists(atPath: ocrResult.outputURL.path))
+    }
+
+    func testSVGToSwiftShapeAndSpriteSheetAndSRT() async throws {
+        // 1. SVG -> SwiftUI Shape .swift
+        let svgURL = tempDir.appendingPathComponent("star_badge.svg")
+        let svgContent = """
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 50 10 L 90 90 L 10 90 Z" />
+            <circle cx="50" cy="55" r="15" />
+        </svg>
+        """
+        try Data(svgContent.utf8).write(to: svgURL)
+
+        let swiftResult = try await DropLabEngine.shared.convertFile(
+            at: svgURL,
+            options: ConversionOptions(targetFormat: .swift, preset: .standard)
+        )
+        XCTAssertEqual(swiftResult.outputURL.pathExtension, "swift")
+        let generatedSwift = try String(contentsOf: swiftResult.outputURL, encoding: .utf8)
+        XCTAssertTrue(generatedSwift.contains("struct StarbadgeShape: Shape"))
+        XCTAssertTrue(generatedSwift.contains("path.move(to:"))
+
+        // 2. Multi-image SpriteSheet (.png + .json atlas)
+        let frame1 = tempDir.appendingPathComponent("frame_01.png")
+        let frame2 = tempDir.appendingPathComponent("frame_02.png")
+        try createTestPNG(at: frame1, width: 64, height: 64)
+        try createTestPNG(at: frame2, width: 64, height: 64)
+
+        let spriteResults = try await DropLabEngine.shared.convertBatch(
+            urls: [frame1, frame2],
+            options: ConversionOptions(targetFormat: .png, preset: .spriteSheet),
+            recordHistory: false
+        )
+        XCTAssertEqual(spriteResults.count, 1)
+        let sheetPNG = spriteResults[0].outputURL
+        let sheetJSON = sheetPNG.deletingPathExtension().appendingPathExtension("json")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: sheetPNG.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: sheetJSON.path))
+
+        // 3. Audio -> .srt SubRip Subtitles
+        let toneURL = tempDir.appendingPathComponent("dialogue.wav")
+        try createSineWaveAudio(at: toneURL, durationSeconds: 5.0)
+        let srtResult = try await DropLabEngine.shared.convertFile(
+            at: toneURL,
+            options: ConversionOptions(targetFormat: .srt, preset: .standard)
+        )
+        XCTAssertEqual(srtResult.outputURL.pathExtension, "srt")
+        let srtText = try String(contentsOf: srtResult.outputURL, encoding: .utf8)
+        XCTAssertTrue(srtText.contains("-->"))
     }
 
     private func createSineWaveAudio(at url: URL, durationSeconds: Double) throws {

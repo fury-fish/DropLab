@@ -12,6 +12,8 @@ public final class DropLabEngine: Sendable {
     private let pdfConverter = PDFConverter()
     private let extendedConverter = ExtendedCodecConverter()
     private let visionAIConverter = VisionAIConverter()
+    private let swiftShapeConverter = SwiftShapeConverter()
+    private let speechAIConverter = SpeechAIConverter()
 
     public init() {}
 
@@ -85,6 +87,26 @@ public final class DropLabEngine: Sendable {
             return [result]
         }
 
+        // Special batch operation: Pack multiple images into 1 SpriteSheet PNG + JSON atlas
+        if options.targetFormat == .png && options.preset == .spriteSheet {
+            let startTime = DispatchTime.now()
+            let outputURL = SafeOutputNaming.makeOutputURL(for: first, options: options)
+            try SpriteSheetGenerator.generateSpriteSheet(from: urls, to: outputURL)
+            let elapsedNano = DispatchTime.now().uptimeNanoseconds - startTime.uptimeNanoseconds
+            let elapsedMs = max(1, Int(elapsedNano / 1_000_000))
+            let result = ConversionResult(
+                sourceURL: first,
+                outputURL: outputURL,
+                targetFormat: .png,
+                preset: .spriteSheet,
+                elapsedMilliseconds: elapsedMs
+            )
+            if recordHistory {
+                ConversionHistory.shared.record(batch: [result])
+            }
+            return [result]
+        }
+
         var results: [ConversionResult] = []
         for url in urls {
             let result = try await convertFile(at: url, options: options)
@@ -120,6 +142,14 @@ public final class DropLabEngine: Sendable {
         case .txt:
             if sourceCategory == .image || sourceCategory == .document {
                 return visionAIConverter
+            }
+        case .swift:
+            if sourceCategory == .image || sourceCategory == .document {
+                return swiftShapeConverter
+            }
+        case .srt:
+            if sourceCategory == .audio || sourceCategory == .video {
+                return speechAIConverter
             }
         default:
             break

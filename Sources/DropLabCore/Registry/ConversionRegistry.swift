@@ -44,14 +44,42 @@ public struct ConversionRegistry: Sendable {
                 OrbitSliceSpec(
                     targetFormat: .flac,
                     subOrbitPresets: [.standard, .trim8s, .mono]
+                ),
+                OrbitSliceSpec(
+                    targetFormat: .srt,
+                    subOrbitPresets: [.standard]
                 )
             ]
 
         case .image:
+            if inputExtension == "svg" {
+                return [
+                    OrbitSliceSpec(
+                        targetFormat: .swift,
+                        subOrbitPresets: [.standard]
+                    ),
+                    OrbitSliceSpec(
+                        targetFormat: .png,
+                        subOrbitPresets: [.standard, .scale2x, .scale05x]
+                    ),
+                    OrbitSliceSpec(
+                        targetFormat: .pdf,
+                        subOrbitPresets: [.standard]
+                    ),
+                    OrbitSliceSpec(
+                        targetFormat: .icns,
+                        subOrbitPresets: [.standard, .appIconSet]
+                    ),
+                    OrbitSliceSpec(
+                        targetFormat: .webp,
+                        subOrbitPresets: [.quality80, .standard]
+                    )
+                ]
+            }
             return [
                 OrbitSliceSpec(
                     targetFormat: .png,
-                    subOrbitPresets: [.standard, .removeBackground, .scale2x, .scale05x, .removeAlpha]
+                    subOrbitPresets: [.standard, .removeBackground, .scale2x, .scale05x, .spriteSheet, .removeAlpha]
                 ),
                 OrbitSliceSpec(
                     targetFormat: .webp,
@@ -71,6 +99,10 @@ public struct ConversionRegistry: Sendable {
                 ),
                 OrbitSliceSpec(
                     targetFormat: .txt,
+                    subOrbitPresets: [.standard]
+                ),
+                OrbitSliceSpec(
+                    targetFormat: .swift,
                     subOrbitPresets: [.standard]
                 )
             ]
@@ -98,8 +130,8 @@ public struct ConversionRegistry: Sendable {
                     subOrbitPresets: [.lei16, .pcm24, .trim8s]
                 ),
                 OrbitSliceSpec(
-                    targetFormat: .m4a,
-                    subOrbitPresets: [.standard, .trim8s]
+                    targetFormat: .srt,
+                    subOrbitPresets: [.standard]
                 )
             ]
 
