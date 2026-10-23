@@ -56,6 +56,7 @@ public final class RadialOrbitController: ObservableObject {
 
         isPresented = true
         viewModel.isExpanded = true
+        HapticEngine.orbitOpened()
 
         startCursorTracking()
     }
@@ -128,6 +129,7 @@ public final class RadialOrbitController: ObservableObject {
     private func triggerConversion(format: TargetFormat, preset: ConversionPreset) {
         guard !hasCommittedSession else { return }
         hasCommittedSession = true
+        HapticEngine.conversionCompleted()
 
         let urls = viewModel.sourceURLs
         let dropPoint = NSEvent.mouseLocation

@@ -36,6 +36,8 @@ final class DropLabCoreTests: XCTestCase {
         XCTAssertTrue(imageSlices.map(\.targetFormat).contains(.png))
         XCTAssertTrue(imageSlices.map(\.targetFormat).contains(.webp))
         XCTAssertTrue(imageSlices.map(\.targetFormat).contains(.icns))
+        XCTAssertTrue(imageSlices.map(\.targetFormat).contains(.txt))
+        XCTAssertTrue(imageSlices[0].subOrbitPresets.contains(.removeBackground))
     }
 
     func testSafeOutputNamingPreventsOverwrites() throws {
@@ -175,6 +177,40 @@ final class DropLabCoreTests: XCTestCase {
             options: ConversionOptions(targetFormat: .pdf, preset: .splitPages)
         )
         XCTAssertTrue(FileManager.default.fileExists(atPath: splitResult.outputURL.path))
+
+        let compressedResult = try await DropLabEngine.shared.convertFile(
+            at: mergedPDFURL,
+            options: ConversionOptions(targetFormat: .pdf, preset: .compressPDF)
+        )
+        XCTAssertTrue(FileManager.default.fileExists(atPath: compressedResult.outputURL.path))
+    }
+
+    func testAppIconSetAndVisionAIFeatures() async throws {
+        let sourceURL = tempDir.appendingPathComponent("logo.png")
+        try createTestPNG(at: sourceURL, width: 256, height: 256)
+
+        // 1. Xcode .appiconset directory generator
+        let appIconResult = try await DropLabEngine.shared.convertFile(
+            at: sourceURL,
+            options: ConversionOptions(targetFormat: .icns, preset: .appIconSet)
+        )
+        XCTAssertEqual(appIconResult.outputURL.pathExtension, "appiconset")
+        let contentsJSON = appIconResult.outputURL.appendingPathComponent("Contents.json")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: contentsJSON.path))
+
+        // 2. AI Background Removal (PNG)
+        let bgRemovedResult = try await DropLabEngine.shared.convertFile(
+            at: sourceURL,
+            options: ConversionOptions(targetFormat: .png, preset: .removeBackground)
+        )
+        XCTAssertTrue(FileManager.default.fileExists(atPath: bgRemovedResult.outputURL.path))
+
+        // 3. Vision OCR (.txt)
+        let ocrResult = try await DropLabEngine.shared.convertFile(
+            at: sourceURL,
+            options: ConversionOptions(targetFormat: .txt, preset: .standard)
+        )
+        XCTAssertTrue(FileManager.default.fileExists(atPath: ocrResult.outputURL.path))
     }
 
     private func createSineWaveAudio(at url: URL, durationSeconds: Double) throws {

@@ -44,34 +44,32 @@ flowchart LR
     M8 --> M9["M9 - Notch Shelf & Extensions (v2.0)"]
 ```
 
-### 🎯 M6 — Tinh chỉnh UX Vòng Xoay từ thực tế sử dụng + Haptics (v1.1)
+### 🎯 M6 — Tinh chỉnh UX Vòng Xoay từ thực tế sử dụng + Haptics (v1.1 — ✅ Đã hoàn thành)
 *Giải quyết các điểm UX phát hiện khi kéo file thật trên Finder:*
-- [ ] **Chống che khuất chữ Sub-Orbit bởi Thumbnail kéo của Finder:**
+- [x] **Chống che khuất chữ Sub-Orbit bởi Thumbnail kéo của Finder:**
   - Khi đang kéo file trong Finder, macOS vẽ thumbnail + tên file ngay dưới con trỏ, dễ đè lên chữ của lát cắt Sub-Orbit (như `Scale 2x`).
-  - **Giải pháp:** Hiển thị **Tên Định dạng + Preset đang chọn thật to ngay tại Tâm Vòng Xoay (Center Hub)** (ví dụ: tâm vòng xoay chuyển từ `.jpg` sang **`PNG • Scale 2x`**) kèm **Badge nổi phía trên con trỏ 48pt** để mắt người dùng luôn nhìn thấy rõ 100% dù thumbnail Finder to đến đâu.
-- [ ] **Phản hồi xúc giác Trackpad (Haptic Feedback):**
-  - Gọi `NSHapticFeedbackManager.defaultPerformer.perform(.alignment)` mỗi khi con trỏ lướt qua các lát cắt trong Vòng Xoay hoặc khi cuộn Trackpad chuyển định dạng trên Notch Tray.
-- [ ] **Phím tắt toàn cục cấp hệ thống (Global Hotkey `⌥Space`):**
+  - **Giải pháp:** Hiển thị **Tên Định dạng + Preset đang chọn thật to ngay tại Tâm Vòng Xoay (Center Hub)** (ví dụ: tâm vòng xoay chuyển từ `.jpg` sang **`PNG • Scale 2x`**) kèm **Top HUD Callout Pill** ở đỉnh vòng xoay để mắt người dùng luôn nhìn thấy rõ 100% dù thumbnail Finder to đến đâu.
+- [x] **Phản hồi xúc giác Trackpad (Haptic Feedback):**
+  - Gọi `NSHapticFeedbackManager.defaultPerformer.perform(.alignment)` mỗi khi con trỏ lướt qua các lát cắt trong Vòng Xoay.
+- [x] **Phím tắt toàn cục cấp hệ thống (Global Hotkey `⌥Space`):**
   - Đăng ký phím tắt toàn cục (`Carbon RegisterEventHotKey`) để khi đang chọn file trong Finder, chỉ cần bấm `⌥Space` là Vòng Xoay bung ngay tại con trỏ chuột mà không cần kéo.
-- [ ] **Cải tiến hiển thị Toast & Progress cho file nặng:**
-  - Hiển thị vòng xoay tiến trình (loading spinner) ngay tại vị trí thả khi xử lý video/audio dài.
 
-### 🛠️ M7 — Công cụ Chuyên sâu cho Developer & Designer (v1.2)
-- [ ] **Xcode `.appiconset` Generator:**
-  - Kéo 1 ảnh gốc (`1024x1024.png`) ➔ chọn `ICNS -> .appiconset` ➔ xuất trọn bộ thư mục `AppIcon.appiconset` (đầy đủ mọi kích thước macOS/iOS + `Contents.json` chuẩn Xcode).
-- [ ] **Nén PDF thông minh (`Compress PDF`):**
-  - Nén dung lượng file PDF nặng (tái nén ảnh nhúng trong PDF bằng Quartz / ImageIO) giảm 50–80% dung lượng.
+### 🛠️ M7 — Công cụ Chuyên sâu cho Developer & Designer (v1.2 — ✅ Đã hoàn thành cốt lõi)
+- [x] **Xcode `.appiconset` Generator:**
+  - Kéo 1 ảnh gốc (`1024x1024.png`) ➔ chọn `ICNS -> .appiconset` ➔ xuất trọn bộ thư mục `AppIcon.appiconset` (đầy đủ mọi kích thước macOS + `Contents.json` chuẩn Xcode).
+- [x] **Nén PDF thông minh (`Compress PDF`):**
+  - Nén dung lượng file PDF nặng (tái nén trang ảnh nhúng trong PDF bằng Quartz / ImageIO) giảm mạnh dung lượng.
 - [ ] **SVG ➔ SwiftUI `Shape` Code:**
   - Kéo file vector `.svg` ➔ sinh ra file `.swift` chứa `struct CustomShape: Shape` (hoặc copy thẳng code SwiftUI vào Clipboard).
 - [ ] **SpriteSheet Generator:**
   - Kéo nhiều ảnh frame `.png` ➔ ghép thành 1 tấm `spritesheet.png` + file metadata `.json`.
 
-### 🧠 M8 — On-Device Apple Silicon AI (v1.3 — 100% Offline & Miễn phí)
+### 🧠 M8 — On-Device Apple Silicon AI (v1.3 — 100% Offline & Miễn phí — ✅ Đã hoàn thành cốt lõi)
 *Tận dụng sẵn Neural Engine thông qua framework `Vision` và `Speech` có sẵn trên macOS 14+:*
-- [ ] **Tách nền ảnh 1 chạm (`PNG -> Remove BG`):**
+- [x] **Tách nền ảnh 1 chạm (`PNG -> Tách nền AI`):**
   - Dùng `VNGenerateForegroundInstanceMaskRequest` (`Vision` framework) để tách nền chủ thể ra khỏi ảnh `.jpg`/`.png`/`.heic` và xuất ra `.png` nền trong suốt ngay tại chỗ.
-- [ ] **OCR Trích xuất văn bản (`Image / PDF -> .txt / .md`):**
-  - Dùng `VNRecognizeTextRequest` đọc chữ từ ảnh chụp màn hình hoặc PDF scan ra file `.txt` / `.md` (và tự copy vào Clipboard).
+- [x] **OCR Trích xuất văn bản (`Image / PDF -> TXT`):**
+  - Dùng `VNRecognizeTextRequest` đọc chữ từ ảnh chụp màn hình hoặc PDF scan ra file `.txt`.
 - [ ] **Audio / Video ➔ Phụ đề `.srt` & `.txt`:**
   - Dùng `SFSpeechRecognizer` (hoặc `whisper.cpp` nếu có) để chép lời file ghi âm/video thành phụ đề `.srt`.
 

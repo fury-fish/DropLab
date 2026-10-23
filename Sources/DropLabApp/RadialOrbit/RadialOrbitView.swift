@@ -66,12 +66,15 @@ public final class RadialOrbitViewModel: ObservableObject {
 
         if dist <= RadialOrbitGeometry.innerRingEnd + 8 {
             // Inside Primary Inner Ring
-            hoveredSubPresetIndex = nil
+            if hoveredSubPresetIndex != nil {
+                hoveredSubPresetIndex = nil
+            }
             for i in slices.indices {
                 let span = RadialOrbitGeometry.primarySliceSpan(index: i, total: slices.count)
                 if span.contains(angleDegrees: angleDeg) {
                     if hoveredSliceIndex != i {
                         hoveredSliceIndex = i
+                        HapticEngine.sliceChanged()
                     }
                     return false
                 }
@@ -92,6 +95,7 @@ public final class RadialOrbitViewModel: ObservableObject {
                 if span.contains(angleDegrees: angleDeg) {
                     if hoveredSubPresetIndex != subIdx {
                         hoveredSubPresetIndex = subIdx
+                        HapticEngine.sliceChanged()
                     }
                     return false
                 }
@@ -100,7 +104,10 @@ public final class RadialOrbitViewModel: ObservableObject {
             for i in slices.indices {
                 let span = RadialOrbitGeometry.primarySliceSpan(index: i, total: slices.count)
                 if span.contains(angleDegrees: angleDeg) {
-                    hoveredSliceIndex = i
+                    if hoveredSliceIndex != i {
+                        hoveredSliceIndex = i
+                        HapticEngine.sliceChanged()
+                    }
                     hoveredSubPresetIndex = nil
                     return false
                 }
@@ -111,6 +118,7 @@ public final class RadialOrbitViewModel: ObservableObject {
                 if span.contains(angleDegrees: angleDeg) {
                     hoveredSliceIndex = i
                     hoveredSubPresetIndex = nil
+                    HapticEngine.sliceChanged()
                     return false
                 }
             }
@@ -173,11 +181,16 @@ public struct RadialOrbitView: View {
                 )
             }
 
-            // Center Hub (File Badge)
+            // Center Hub (File Badge + Active Selection Readout so Finder's drag thumbnail never hides selection)
             centerHubView
 
-            // Bottom Live Output Preview Pill
+            // Top & Bottom Live Selection HUD Pills
             VStack {
+                if let activeSlice = viewModel.activeSlice {
+                    topSelectionCalloutPill(slice: activeSlice, preset: viewModel.activePreset)
+                        .padding(.top, 4)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
                 Spacer()
                 previewFooterPill
                     .padding(.bottom, 6)
@@ -333,15 +346,21 @@ public struct RadialOrbitView: View {
         let firstURL = viewModel.sourceURLs.first
         let ext = firstURL?.pathExtension.lowercased() ?? "file"
         let category = firstURL.map { FileCategory.detect(for: $0) } ?? .unknown
+        let activeSlice = viewModel.activeSlice
 
         return ZStack {
             Circle()
                 .fill(
                     RadialGradient(
-                        colors: [
-                            Color(red: 0.12, green: 0.55, blue: 0.98).opacity(0.42),
-                            Color(red: 0.08, green: 0.11, blue: 0.18).opacity(0.95)
-                        ],
+                        colors: activeSlice != nil
+                            ? [
+                                Color(red: 1.0, green: 0.56, blue: 0.10).opacity(0.48),
+                                Color(red: 0.10, green: 0.11, blue: 0.18).opacity(0.96)
+                            ]
+                            : [
+                                Color(red: 0.12, green: 0.55, blue: 0.98).opacity(0.42),
+                                Color(red: 0.08, green: 0.11, blue: 0.18).opacity(0.95)
+                            ],
                         center: .center,
                         startRadius: 4,
                         endRadius: RadialOrbitGeometry.hubRadius
@@ -353,25 +372,69 @@ public struct RadialOrbitView: View {
                 )
                 .overlay(
                     Circle()
-                        .stroke(Color.cyan.opacity(0.75), lineWidth: 1.8)
+                        .stroke(
+                            activeSlice != nil ? Color.orange.opacity(0.9) : Color.cyan.opacity(0.75),
+                            lineWidth: 2.0
+                        )
                 )
-                .shadow(color: Color.cyan.opacity(0.45), radius: 10)
+                .shadow(
+                    color: (activeSlice != nil ? Color.orange : Color.cyan).opacity(0.45),
+                    radius: 10
+                )
 
-            VStack(spacing: 2) {
-                Image(systemName: category.systemSymbolName)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Color.cyan)
-                Text(".\(ext)")
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                    .foregroundStyle(Color.white)
-                if viewModel.sourceURLs.count > 1 {
-                    Text("\(viewModel.sourceURLs.count) files")
-                        .font(.system(size: 9, weight: .medium))
-                        .foregroundStyle(Color.white.opacity(0.7))
+            if let slice = activeSlice {
+                VStack(spacing: 1) {
+                    Text(slice.targetFormat.label)
+                        .font(.system(size: 14, weight: .heavy, design: .rounded))
+                        .foregroundStyle(Color.white)
+                    Text(viewModel.activePreset.displayTitle)
+                        .font(.system(size: 9.5, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(red: 1.0, green: 0.80, blue: 0.35))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
+                .padding(.horizontal, 6)
+            } else {
+                VStack(spacing: 2) {
+                    Image(systemName: category.systemSymbolName)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color.cyan)
+                    Text(".\(ext)")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .foregroundStyle(Color.white)
+                    if viewModel.sourceURLs.count > 1 {
+                        Text("\(viewModel.sourceURLs.count) files")
+                            .font(.system(size: 9, weight: .medium))
+                            .foregroundStyle(Color.white.opacity(0.7))
+                    }
                 }
             }
         }
         .position(RadialOrbitGeometry.center)
+    }
+
+    private func topSelectionCalloutPill(slice: OrbitSliceSpec, preset: ConversionPreset) -> some View {
+        HStack(spacing: 6) {
+            Text(slice.targetFormat.label)
+                .font(.system(size: 12.5, weight: .heavy, design: .rounded))
+                .foregroundStyle(Color.orange)
+            Image(systemName: "arrow.right")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(Color.white.opacity(0.7))
+            Text(preset.displayTitle)
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .foregroundStyle(Color.white)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 5)
+        .background(
+            Capsule()
+                .fill(Color(red: 0.10, green: 0.11, blue: 0.15).opacity(0.94))
+                .overlay(
+                    Capsule()
+                        .stroke(Color.orange.opacity(0.55), lineWidth: 1.2)
+                )
+        )
     }
 
     private var previewFooterPill: some View {

@@ -11,6 +11,7 @@ public final class DropLabEngine: Sendable {
     private let dataConverter = DataConverter()
     private let pdfConverter = PDFConverter()
     private let extendedConverter = ExtendedCodecConverter()
+    private let visionAIConverter = VisionAIConverter()
 
     public init() {}
 
@@ -115,6 +116,10 @@ public final class DropLabEngine: Sendable {
         case .gif:
             if sourceCategory == .video {
                 return extendedConverter
+            }
+        case .txt:
+            if sourceCategory == .image || sourceCategory == .document {
+                return visionAIConverter
             }
         default:
             break

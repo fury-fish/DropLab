@@ -18,7 +18,7 @@ public enum SafeOutputNaming {
             directory = URL(fileURLWithPath: NSTemporaryDirectory())
         }
         let baseName = sourceURL.deletingPathExtension().lastPathComponent
-        let targetExt = options.targetFormat.fileExtension
+        let targetExt = (options.preset == .appIconSet) ? "appiconset" : options.targetFormat.fileExtension
 
         var stem = baseName
         if let suffix = options.preset.filenameSuffix {

@@ -29,6 +29,15 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
         setupStatusItem()
         GlobalDragMonitor.shared.start()
 
+        GlobalHotkeyManager.shared.onHotkeyPressed = { [weak self] in
+            if RadialOrbitController.shared.isPresented {
+                RadialOrbitController.shared.dismiss()
+            } else {
+                self?.openOrbitWithFinderSelectionAtCursor()
+            }
+        }
+        GlobalHotkeyManager.shared.registerOptionSpaceHotkey()
+
         // If launched with `--demo-orbit`, immediately pop up the Radial Orbit with a demo audio file
         if CommandLine.arguments.contains("--demo-orbit") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
@@ -59,7 +68,7 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(headerItem)
 
         let hintItem = NSMenuItem(
-            title: "Kéo file bất kỳ trong Finder & giữ yên 0.4s",
+            title: "Kéo file giữ 0.4s hoặc nhấn ⌥Space khi chọn file",
             action: nil,
             keyEquivalent: ""
         )
@@ -205,6 +214,20 @@ final class DropLabAppDelegate: NSObject, NSApplicationDelegate {
         RadialOrbitController.shared.present(
             for: urls,
             at: center,
+            duringActiveDrag: false
+        )
+    }
+
+    private func openOrbitWithFinderSelectionAtCursor() {
+        let urls = FinderSelectionBridge.selectedFinderFileURLs()
+        guard !urls.isEmpty else {
+            NSSound.beep()
+            ConversionToastController.shared.showError("Hãy chọn file trong Finder trước khi nhấn ⌥Space", near: NSEvent.mouseLocation)
+            return
+        }
+        RadialOrbitController.shared.present(
+            for: urls,
+            at: NSEvent.mouseLocation,
             duringActiveDrag: false
         )
     }

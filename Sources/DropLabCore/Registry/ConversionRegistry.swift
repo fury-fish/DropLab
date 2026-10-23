@@ -51,7 +51,7 @@ public struct ConversionRegistry: Sendable {
             return [
                 OrbitSliceSpec(
                     targetFormat: .png,
-                    subOrbitPresets: [.standard, .scale2x, .scale05x, .removeAlpha]
+                    subOrbitPresets: [.standard, .removeBackground, .scale2x, .scale05x, .removeAlpha]
                 ),
                 OrbitSliceSpec(
                     targetFormat: .webp,
@@ -67,11 +67,11 @@ public struct ConversionRegistry: Sendable {
                 ),
                 OrbitSliceSpec(
                     targetFormat: .icns,
-                    subOrbitPresets: [.standard]
+                    subOrbitPresets: [.standard, .appIconSet]
                 ),
                 OrbitSliceSpec(
-                    targetFormat: .pdf,
-                    subOrbitPresets: [.standard, .mergePDF]
+                    targetFormat: .txt,
+                    subOrbitPresets: [.standard]
                 )
             ]
 
@@ -115,7 +115,11 @@ public struct ConversionRegistry: Sendable {
                 ),
                 OrbitSliceSpec(
                     targetFormat: .pdf,
-                    subOrbitPresets: [.splitPages, .mergePDF]
+                    subOrbitPresets: [.compressPDF, .splitPages, .mergePDF]
+                ),
+                OrbitSliceSpec(
+                    targetFormat: .txt,
+                    subOrbitPresets: [.standard]
                 )
             ]
 

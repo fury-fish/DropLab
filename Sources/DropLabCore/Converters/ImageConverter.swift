@@ -19,7 +19,10 @@ public struct ImageConverter: FileConverter {
             }
         }
 
-        let baseImage = try loadCGImage(from: resolvedSource)
+        var baseImage = try loadCGImage(from: resolvedSource)
+        if options.preset == .removeBackground {
+            baseImage = try VisionAIConverter.removeBackground(from: baseImage)
+        }
 
         let scaleFactor: CGFloat
         switch options.preset {
@@ -41,7 +44,11 @@ public struct ImageConverter: FileConverter {
         }
 
         if options.targetFormat == .icns {
-            try writeICNS(from: processedImage, to: outputURL)
+            if options.preset == .appIconSet {
+                try writeAppIconSet(from: processedImage, to: outputURL)
+            } else {
+                try writeICNS(from: processedImage, to: outputURL)
+            }
             return
         }
 
@@ -223,6 +230,77 @@ public struct ImageConverter: FileConverter {
             throw DropLabError.conversionFailed("Failed to finalize .icns file")
         }
         try (outData as Data).write(to: outputURL, options: .atomic)
+    }
+
+    private func writeAppIconSet(from image: CGImage, to outputURL: URL) throws {
+        try FileManager.default.createDirectory(at: outputURL, withIntermediateDirectories: true)
+
+        struct IconSlot {
+            let pointSize: Int
+            let scale: Int
+            var pixelSize: Int { pointSize * scale }
+            var filename: String {
+                scale == 1 ? "icon_\(pointSize)x\(pointSize).png" : "icon_\(pointSize)x\(pointSize)@\(scale)x.png"
+            }
+        }
+
+        let slots: [IconSlot] = [
+            IconSlot(pointSize: 16, scale: 1),
+            IconSlot(pointSize: 16, scale: 2),
+            IconSlot(pointSize: 32, scale: 1),
+            IconSlot(pointSize: 32, scale: 2),
+            IconSlot(pointSize: 128, scale: 1),
+            IconSlot(pointSize: 128, scale: 2),
+            IconSlot(pointSize: 256, scale: 1),
+            IconSlot(pointSize: 256, scale: 2),
+            IconSlot(pointSize: 512, scale: 1),
+            IconSlot(pointSize: 512, scale: 2)
+        ]
+
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        var imagesArray: [[String: String]] = []
+
+        for slot in slots {
+            let dim = slot.pixelSize
+            guard let ctx = CGContext(
+                data: nil,
+                width: dim,
+                height: dim,
+                bitsPerComponent: 8,
+                bytesPerRow: 0,
+                space: colorSpace,
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+            ) else { continue }
+            ctx.interpolationQuality = .high
+            ctx.draw(image, in: CGRect(x: 0, y: 0, width: dim, height: dim))
+            guard let resized = ctx.makeImage() else { continue }
+
+            let fileURL = outputURL.appendingPathComponent(slot.filename)
+            let outData = NSMutableData()
+            if let dest = CGImageDestinationCreateWithData(outData as CFMutableData, UTType.png.identifier as CFString, 1, nil) {
+                CGImageDestinationAddImage(dest, resized, nil)
+                if CGImageDestinationFinalize(dest) {
+                    try (outData as Data).write(to: fileURL, options: .atomic)
+                }
+            }
+
+            imagesArray.append([
+                "filename": slot.filename,
+                "idiom": "mac",
+                "scale": "\(slot.scale)x",
+                "size": "\(slot.pointSize)x\(slot.pointSize)"
+            ])
+        }
+
+        let contentsDict: [String: Any] = [
+            "images": imagesArray,
+            "info": [
+                "author": "DropLab",
+                "version": 1
+            ]
+        ]
+        let jsonData = try JSONSerialization.data(withJSONObject: contentsDict, options: [.prettyPrinted, .sortedKeys])
+        try jsonData.write(to: outputURL.appendingPathComponent("Contents.json"), options: .atomic)
     }
 
     private func writeImageAsPDF(_ image: CGImage, to outputURL: URL) throws {

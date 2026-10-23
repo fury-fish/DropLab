@@ -11,19 +11,22 @@ public enum ConversionPreset: String, Codable, CaseIterable, Identifiable, Senda
     case trim8s = "trim8s"
     case alac = "alac"
 
-    // Image presets
+    // Image & AI Vision presets
+    case removeBackground = "nobg"
     case scale2x = "scale2x"
     case scale05x = "scale05x"
     case quality80 = "quality80"
     case removeAlpha = "noalpha"
+    case appIconSet = "appiconset"
 
     // Video & GIF presets
     case muteAudio = "mute"
     case fps15 = "fps15"
 
-    // Document (PDF) presets
+    // Document (PDF / OCR) presets
     case mergePDF = "merge"
     case splitPages = "split"
+    case compressPDF = "compress"
 
     // Data presets
     case prettify = "prettify"
@@ -42,14 +45,17 @@ public enum ConversionPreset: String, Codable, CaseIterable, Identifiable, Senda
         case .mono: return "Mono"
         case .trim8s: return "Cắt 8s"
         case .alac: return "ALAC"
+        case .removeBackground: return "Tách nền AI"
         case .scale2x: return "Scale 2x"
         case .scale05x: return "Scale 0.5x"
         case .quality80: return "80% Qual"
         case .removeAlpha: return "No Alpha"
+        case .appIconSet: return ".appiconset"
         case .muteAudio: return "Tắt tiếng"
         case .fps15: return "15 FPS"
         case .mergePDF: return "Gộp PDF"
         case .splitPages: return "Tách trang"
+        case .compressPDF: return "Nén PDF"
         case .prettify: return "Prettify"
         case .minify: return "Minify"
         case .binaryPlist: return "Binary"
@@ -66,14 +72,17 @@ public enum ConversionPreset: String, Codable, CaseIterable, Identifiable, Senda
         case .mono: return "mono"
         case .trim8s: return "trim8s"
         case .alac: return "ALAC"
+        case .removeBackground: return "nobg"
         case .scale2x: return "2x"
         case .scale05x: return "05x"
         case .quality80: return "q80"
         case .removeAlpha: return "opaque"
+        case .appIconSet: return "AppIcon"
         case .muteAudio: return "muted"
         case .fps15: return "15fps"
         case .mergePDF: return "merged"
         case .splitPages: return "page1"
+        case .compressPDF: return "compressed"
         case .prettify: return "pretty"
         case .minify: return "min"
         case .binaryPlist: return "bin"
