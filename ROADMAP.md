@@ -1,119 +1,84 @@
-# 🗺️ DropLab — Roadmap (Locked) / Lộ trình đã chốt
+# 🗺️ DropLab — Roadmap & Phase 2 Plan
 
-> **Trạng thái:** 🎉 Đã hoàn thành toàn bộ lộ trình macOS **1.0.0** (**Phase 0**, **M1**, **M2**, **M3**, **M4**, **M5**). Bước tuỳ chọn sau 1.0: **M6 (iOS/iPadOS Companion)**.
-> Bản này thay cho roadmap 4 milestone ban đầu trong `README.md`.
-> Mục tiêu: **ra được MVP macOS dùng thật sớm nhất**, xử lý các rủi ro kỹ thuật lớn trước khi làm UI đẹp.
+> **Trạng thái hiện tại:** 🎉 Đã hoàn thành toàn bộ lộ trình **Phase 1 — macOS v1.0.0** (`Phase 0`, `M1`, `M2`, `M3`, `M4`, `M5`) và bản vá quyền truy cập file thực tế (`109451c`).
+> **Bước tiếp theo:** **Phase 2 (M6 ➔ M9)** — Tinh chỉnh UX thực chiến, công cụ cho Developer/Designer, và AI cục bộ trên Apple Silicon (`Vision` / `Speech`).
 
-## 0. Quyết định đã chốt / Decisions
+---
+
+## 0. Quyết định cốt lõi (Đã chốt)
 
 | # | Hạng mục | Quyết định |
 |---|---|---|
-| D1 | Tên sản phẩm | **DropLab** (Swift package `DropLabCore`, CLI `droplab`) |
-| D2 | Phân phối | **Developer ID + Notarization**, không sandbox (Mac App Store để sau) |
-| D3 | Codec bên thứ ba | **Đồng ý** đóng gói LAME, libwebp, libopus/libvorbis, ffmpeg (bản LGPL, link động), kèm license trong About |
-| D4 | Nền tảng ưu tiên | **macOS là chính**, iPhone/iPad là phụ. Mọi milestone đến 1.0 chỉ phục vụ macOS; iOS là companion sau 1.0 và có thể bị cắt/hoãn nếu ảnh hưởng chất lượng bản Mac |
-| D5 | Ưu tiên giao diện | Làm **Vòng Xoay Trọng Lực (Radial Orbit — Concept 1) trước** ở M2 (MVP UI), sau đó mới làm **Notch Tray (Concept 2)** ở M3 |
+| D1 | Tên sản phẩm | **DropLab** (Swift package `DropLabCore`, CLI `droplab`, App `DropLab.app`) |
+| D2 | Phân phối | **Developer ID + Notarization**, không sandbox (để ghi file trực tiếp cạnh file gốc) |
+| D3 | Codec bên thứ ba | **Đồng ý** đóng gói/liên kết LAME (`mp3`), libwebp (`webp`), FFmpeg LGPL (`ogg`, `flac`, `webm`), kèm license trong About |
+| D4 | Nền tảng ưu tiên | **macOS là chính**, iPhone/iPad là phụ (chỉ làm sau khi bản Mac đã hoàn chỉnh) |
+| D5 | Ưu tiên giao diện | **Vòng Xoay Trọng Lực (Radial Orbit — Concept 1)** là chủ lực, kết hợp **Lò Luyện Tai Thỏ (Notch Tray — Concept 2)** |
 
 ---
 
-## 1. Review kết quả — Các vấn đề của plan cũ
+## 1. Phase 1 — Nền tảng macOS 1.0.0 (✅ Đã hoàn thành)
 
-| # | Vấn đề trong plan cũ | Mức độ | Lý do | Cách sửa |
-|---|---|---|---|---|
-| 1 | **iOS: kéo file thả vào Dynamic Island** | 🔴 Không khả thi | Live Activity / Dynamic Island chỉ hiển thị, **không nhận drop**. App iOS cũng không được vẽ đè lên app khác (Files, Photos). | iOS dùng **Share/Action Extension** + **App Intents (Shortcuts)** + drop zone *bên trong app*. Dynamic Island chỉ dùng để **hiện tiến trình** convert. |
-| 2 | **iOS: Radial Orbit "kéo & giữ" khi đang ở app khác** | 🔴 Không khả thi | Không có global gesture/overlay trên iOS. | Radial Orbit trên iOS chỉ hoạt động **trong app** (iPad: drag từ Files ở Split View vào app). |
-| 3 | **"100% native"** cho MP3/OGG/WebP/WebM/MKV/AVIF/EPS | 🔴 Sai | AVFoundation/AudioToolbox **không encode MP3**, không hỗ trợ OGG/Vorbis, WebM, MKV. ImageIO **đọc** được WebP nhưng **không ghi**. macOS mới đã bỏ render EPS/PostScript. | Chia 2 tầng: **Native core** (mặc định) + **Extended codecs** (`libwebp`, `LAME`, `libvorbis/opus`, hoặc `ffmpeg` LGPL, link động). Ghi rõ trong ma trận định dạng. |
-| 4 | **Thả vào Notch rồi cuộn Trackpad 2 ngón để chọn định dạng** | 🟠 Khó dùng | Đang giữ click để kéo + cuộn 2 ngón cùng lúc gần như không làm được trên trackpad. | **Thả trước → tray giữ file → chọn bằng scroll / click / phím mũi tên → Enter**. |
-| 5 | **Xuất file "ngay cạnh file gốc"** | 🟠 Rủi ro phân phối | App Sandbox (Mac App Store) chỉ cấp quyền cho file được thả, **không cấp quyền ghi vào thư mục cha**. | Giai đoạn đầu phân phối **Developer ID + Notarization** (không sandbox). Nếu lên App Store sau: xin quyền thư mục 1 lần + security-scoped bookmark, fallback `~/Downloads/DropLab`. |
-| 6 | **Làm cả 2 concept song song ngay từ M1–M2** | 🟠 Scope quá lớn | Hai cơ chế overlay khác nhau, nhân đôi chi phí UI/QA trước khi có converter chạy được. | MVP làm **Radial Orbit (Vòng xoay)** trước ở M2; **Notch Tray** làm ở M3. |
-| 7 | **Notch chỉ có trên MacBook có tai thỏ** | 🟡 Thiếu | Mac mini/Studio, màn hình ngoài, MacBook Air Intel không có notch. | Fallback: **viên thuốc ẩn ở top-center** của màn hình đang chứa con trỏ. |
-| 8 | **Phát hiện "global drag + hold 0.4s"** chưa được kiểm chứng | 🟡 Rủi ro | Cần theo dõi `NSPasteboard(name: .drag)` + global mouse monitor, phải không cản trở drag gốc và không gây giật. | Đưa vào **Phase 0 spike** trước khi cam kết UX Radial. |
-| 9 | **Converter đặt ở M3, sau UI** | 🟡 Thứ tự sai | UI không có engine phía sau thì không demo/test được. | Làm **Conversion Engine + CLI** trước, UI gọi vào engine. |
-| 10 | **Ma trận định dạng quá rộng** (EPUB, DOCX↔PDF, SVG→SwiftUI Shape, Whisper) | 🟡 Scope creep | Mỗi mục là một dự án con. | Chuyển sang **Backlog / Later**. |
-| 11 | Thiếu phần **kiểm thử, hiệu năng, phân phối** | 🟡 Thiếu | Không có tiêu chí "Done". | Thêm Definition of Done cho mỗi milestone. |
-| 12 | Tên không thống nhất: repo `DropLab` vs README `OrbitDrop (NotchAlchemy)` | 🟡 | Gây nhầm khi tạo bundle id, landing page. | ✅ Đã chốt tên **DropLab**. |
+- [x] **Phase 0 — Technical Spikes:** Kiểm chứng `NSPasteboard(name: .drag)` 60 Hz, `NSPanel` non-activating + `NSDraggingDestination`, pipeline `AVAssetReader/Writer` & `ImageIO`.
+- [x] **M1 — `DropLabCore` Engine + CLI `droplab`:**
+  - Nhận diện `UTType`, `ConversionRegistry`, `SafeOutputNaming` (chống ghi đè), `ConversionHistory` (Undo 1 chạm).
+  - Native Audio (`wav`, `caf`, `aiff`, `m4a` + `LEI16`, `24-bit`, `Mono`, `Trim 8s`), Image (`png`, `jpg`, `heic`, `tiff`, `icns`, `pdf`, `svg`), Video (`mp4`, `mov`, `Mute Audio`), Data (`json ⟷ plist`, `csv ⟷ tsv`).
+- [x] **M2 — Radial Orbit MVP (Concept 1):**
+  - Kéo & giữ yên chuột `0.4s` bung Vòng Xoay 2 tầng (Vòng trong: Định dạng đích, Vòng ngoài: Sub-Orbit Presets).
+  - Thả chuột để convert ngay cạnh file gốc, Toast thông báo kèm nút mở Finder & Hoàn tác.
+- [x] **M3 — Notch Tray + Inline Waveform Trimmer (Concept 2):**
+  - Tự hiện viên thuốc đón file ở Notch khi bắt đầu kéo; thả file để mở khay điều khiển, cuộn Trackpad 2 ngón / phím `←` `→`, chỉnh 2 tay cầm vàng cắt Waveform & nghe thử (`Space`).
+- [x] **M4 — Extended Codecs + Video/PDF Multi-tool:**
+  - Tích hợp `mp3` (LAME), `webp` (`cwebp`), `ogg`, `flac`, `webm` (FFmpeg), `Video ➔ Animated GIF` (native `ImageIO`), gộp & tách trang PDF (`PDFKit`).
+- [x] **M5 — Release 1.0 macOS Polish & File Access Fix:**
+  - Đóng gói `DropLab.app` v1.0.0 kèm `AppIcon.icns`, `Launch at Login` (`SMAppService`), `About & Licenses`, mở khóa Security-Scoped / File-Reference URLs & bộ giải mã ảnh 4 tầng (`ImageIO` ➔ `CoreImage` ➔ `NSImage`).
 
 ---
 
-## 2. Lộ trình mới
+## 2. Phase 2 — Lộ trình Tiếp theo (v1.1 ➔ v2.0)
 
 ```mermaid
 flowchart LR
-    P0["Phase 0 - Spikes"] --> M1["M1 - Engine + CLI"]
-    M1 --> M2["M2 - Radial Orbit MVP"]
-    M2 --> M3["M3 - Notch Tray"]
-    M3 --> M4["M4 - Extended codecs + Trim"]
-    M4 --> M5["M5 - Release 1.0 macOS"]
-    M5 --> M6["M6 - iOS Companion"]
+    M6["M6 - UX & Haptics (v1.1)"] --> M7["M7 - Dev & Design Tools (v1.2)"]
+    M7 --> M8["M8 - Local AI Vision/Speech (v1.3)"]
+    M8 --> M9["M9 - Notch Shelf & Extensions (v2.0)"]
 ```
 
-### Phase 0 — Technical Spikes (✅ Hoàn tất)
-Mục tiêu: trả lời "làm được không" trước khi viết code thật.
-- [x] Spike A: Phát hiện drag toàn cục (`NSPasteboard(name: .drag)` changeCount + `NSEvent.pressedMouseButtons` / `NSEvent.mouseLocation` 60 Hz), đo độ trễ và xác định hold `0.4s` không cần quyền Accessibility.
-- [x] Spike B: `NSPanel` non-activating kết hợp `NSDraggingDestination` (`.fileURL`), nhận drop ngay trên lát cắt mà không cướp focus app đang dùng và không làm di chuyển file gốc trong Finder.
-- [x] Spike C: Convert `mp3/wav → wav LEI16 / 24-bit / caf / m4a` và trim bằng `AVAssetReader/Writer`; `heic/png → png/jpg/icns/pdf` bằng `ImageIO`.
-- [x] Spike D: Ghi file ra thư mục gốc khi chạy **không sandbox** (`SafeOutputNaming` chống ghi đè).
+### 🎯 M6 — Tinh chỉnh UX Vòng Xoay từ thực tế sử dụng + Haptics (v1.1)
+*Giải quyết các điểm UX phát hiện khi kéo file thật trên Finder:*
+- [ ] **Chống che khuất chữ Sub-Orbit bởi Thumbnail kéo của Finder:**
+  - Khi đang kéo file trong Finder, macOS vẽ thumbnail + tên file ngay dưới con trỏ, dễ đè lên chữ của lát cắt Sub-Orbit (như `Scale 2x`).
+  - **Giải pháp:** Hiển thị **Tên Định dạng + Preset đang chọn thật to ngay tại Tâm Vòng Xoay (Center Hub)** (ví dụ: tâm vòng xoay chuyển từ `.jpg` sang **`PNG • Scale 2x`**) kèm **Badge nổi phía trên con trỏ 48pt** để mắt người dùng luôn nhìn thấy rõ 100% dù thumbnail Finder to đến đâu.
+- [ ] **Phản hồi xúc giác Trackpad (Haptic Feedback):**
+  - Gọi `NSHapticFeedbackManager.defaultPerformer.perform(.alignment)` mỗi khi con trỏ lướt qua các lát cắt trong Vòng Xoay hoặc khi cuộn Trackpad chuyển định dạng trên Notch Tray.
+- [ ] **Phím tắt toàn cục cấp hệ thống (Global Hotkey `⌥Space`):**
+  - Đăng ký phím tắt toàn cục (`Carbon RegisterEventHotKey`) để khi đang chọn file trong Finder, chỉ cần bấm `⌥Space` là Vòng Xoay bung ngay tại con trỏ chuột mà không cần kéo.
+- [ ] **Cải tiến hiển thị Toast & Progress cho file nặng:**
+  - Hiển thị vòng xoay tiến trình (loading spinner) ngay tại vị trí thả khi xử lý video/audio dài.
 
-**Done khi:** có báo cáo ngắn từng spike (OK / không OK / workaround).
+### 🛠️ M7 — Công cụ Chuyên sâu cho Developer & Designer (v1.2)
+- [ ] **Xcode `.appiconset` Generator:**
+  - Kéo 1 ảnh gốc (`1024x1024.png`) ➔ chọn `ICNS -> .appiconset` ➔ xuất trọn bộ thư mục `AppIcon.appiconset` (đầy đủ mọi kích thước macOS/iOS + `Contents.json` chuẩn Xcode).
+- [ ] **Nén PDF thông minh (`Compress PDF`):**
+  - Nén dung lượng file PDF nặng (tái nén ảnh nhúng trong PDF bằng Quartz / ImageIO) giảm 50–80% dung lượng.
+- [ ] **SVG ➔ SwiftUI `Shape` Code:**
+  - Kéo file vector `.svg` ➔ sinh ra file `.swift` chứa `struct CustomShape: Shape` (hoặc copy thẳng code SwiftUI vào Clipboard).
+- [ ] **SpriteSheet Generator:**
+  - Kéo nhiều ảnh frame `.png` ➔ ghép thành 1 tấm `spritesheet.png` + file metadata `.json`.
 
-### M1 — Conversion Engine + CLI (✅ Hoàn tất)
-- [x] Swift Package `DropLabCore`: `FileConverter` protocol, `ConversionRegistry` theo `UTType` → danh sách đích hợp lệ + Sub-Orbit presets.
-- [x] Converter native:
-  - Audio: `wav`, `aiff`, `caf`, `m4a (AAC/ALAC)` + preset `LEI16`, `24-bit`, `Mono`, `Trim`.
-  - Image: `heic`, `png`, `jpg`, `tiff`, `gif`, `pdf` + `Scale`, `Quality`, `Remove Alpha`; `png → icns`.
-  - Data: `json ⟷ plist`, `csv ⟷ tsv`, `minify/prettify`.
-- [x] CLI `droplab convert in.mp3 --to wav --preset lei16` (thay thế trực tiếp `afconvert`/`ffmpeg` trong workflow hiện tại).
-- [x] Đặt tên file đầu ra an toàn (không ghi đè: `match_LEI16.wav`, `match_LEI16 2.wav`).
+### 🧠 M8 — On-Device Apple Silicon AI (v1.3 — 100% Offline & Miễn phí)
+*Tận dụng sẵn Neural Engine thông qua framework `Vision` và `Speech` có sẵn trên macOS 14+:*
+- [ ] **Tách nền ảnh 1 chạm (`PNG -> Remove BG`):**
+  - Dùng `VNGenerateForegroundInstanceMaskRequest` (`Vision` framework) để tách nền chủ thể ra khỏi ảnh `.jpg`/`.png`/`.heic` và xuất ra `.png` nền trong suốt ngay tại chỗ.
+- [ ] **OCR Trích xuất văn bản (`Image / PDF -> .txt / .md`):**
+  - Dùng `VNRecognizeTextRequest` đọc chữ từ ảnh chụp màn hình hoặc PDF scan ra file `.txt` / `.md` (và tự copy vào Clipboard).
+- [ ] **Audio / Video ➔ Phụ đề `.srt` & `.txt`:**
+  - Dùng `SFSpeechRecognizer` (hoặc `whisper.cpp` nếu có) để chép lời file ghi âm/video thành phụ đề `.srt`.
 
-**Done khi:** unit test cho mỗi cặp định dạng với file mẫu; convert ảnh 12MP < 300 ms, audio 3 phút < 1 s trên M1.
-
-### M2 — Radial Orbit MVP (macOS) (✅ Hoàn tất)
-- [x] App menu bar (`LSUIElement`), không có Dock icon.
-- [x] Phát hiện drag + hold 0.4s (từ Spike A), hiện pie menu `Radial Orbit` (`NSPanel` non-activating) ngay dưới con trỏ.
-- [x] Vòng trong: định dạng đích theo `UTType`; vòng ngoài (Sub-Orbit): preset (`LEI16`, `24-bit`, `Mono`, `Trim`...).
-- [x] Thả lên lát → convert và xuất ngay cạnh file gốc; thả ra ngoài / nhấn `Esc` → huỷ, drag gốc vẫn hoạt động bình thường.
-- [x] Mở nhanh từ Menu Bar (File mẫu Audio/Image hoặc chọn file bất kỳ).
-- [x] Hỗ trợ kéo **nhiều file** cùng lúc (batch), hiển thị Toast tiến trình + Undo (xoá file vừa tạo).
-- [x] Settings cơ bản: bật/tắt vòng xoay, thời gian hold (`0.2s–1.0s`), tuỳ chọn giữ phím `Option (⌥)`, âm thanh, mở Finder.
-
-**Done khi:** dùng hằng ngày được cho workflow `mp3 → wav LEI16` và `heic → png` bằng vòng xoay tại con trỏ mà không mở cửa sổ nào, không làm hỏng drag & drop thông thường giữa các app (Finder, Safari, Xcode, Slack).
-
-### M3 — Notch Tray (macOS) (✅ Hoàn tất)
-- [x] Vùng drop ở notch; fallback viên thuốc top-center cho máy không notch / màn hình ngoài.
-- [x] Luồng: **thả file → tray mở → chọn định dạng (scroll Trackpad / click / ← → / Enter) → xuất cạnh file gốc**.
-- [x] Inline Waveform Trimmer ngay trong tray (tay cầm vàng kéo thả, nghe thử `Space`, cắt `00:00 - 00:08` hoặc tuỳ chọn).
-- [x] Tích hợp vào Settings để người dùng bật/tắt độc lập Radial Orbit, Notch Tray hoặc dùng cả hai cùng lúc.
-
-**Done khi:** kéo thả vào Notch mượt mà trên cả màn hình MacBook có tai thỏ và màn hình rời.
-
-### M4 — Extended Codecs + Waveform Trim (✅ Hoàn tất)
-- [x] Gói codec mở rộng (`ExtendedCodecConverter`, ghi license trong `AboutView`): `mp3` encode (LAME/ffmpeg), `webp` encode (libwebp/cwebp), `ogg`, `flac`, `webm`.
-- [x] Waveform trimmer trong tray (tay cầm vàng, preview audio, `00:00 - 00:08`).
-- [x] Video & PDF: `mov ⟷ mp4 ⟷ webm`, `Mute Audio`, trích audio, `Video → Animated GIF` (native `ImageIO`), gộp & tách trang PDF (`PDFKit`).
-
-**Done khi:** tất cả định dạng trong ma trận "Phase M4" chạy được, license bên thứ ba có trong About.
-
-### M5 — Release 1.0 macOS (✅ Hoàn tất)
-- [x] Đóng gói `DropLab.app` v1.0.0 kèm `AppIcon.icns` đa độ phân giải (`16px -> 1024px`), code-signing & bản phân phối `DropLab-1.0.0-macOS.zip`.
-- [x] Tích hợp `Launch at Login` (`SMAppService`), đọc file đang chọn trong Finder (`FinderSelectionBridge`), và màn hình `About & Third-Party Licenses`.
-
-### M6 — iOS / iPadOS Companion (phụ, sau 1.0 — tuỳ chọn)
-> Chỉ bắt đầu khi bản macOS 1.0 đã ổn định. Tái sử dụng `DropLabCore`; phạm vi tối thiểu.
-- [ ] **Share/Action Extension**: "Convert with DropLab" từ Files/Photos.
-- [ ] **App Intents** để dùng trong Shortcuts.
-- [ ] Drop zone + Radial Orbit **trong app** (đặc biệt hữu ích trên iPad Split View).
-- [ ] Live Activity / Dynamic Island hiển thị **tiến trình** convert (không nhận drop).
-
----
-
-## 3. Backlog / Later
-- Speech-to-text `audio → txt/srt` (Speech framework hoặc whisper.cpp).
-- OCR `image → txt` (Vision).
-- `md ⟷ html ⟷ pdf`, DOCX, EPUB, compress PDF.
-- SVG → raster / SVG → SwiftUI `Shape`.
-- Sprite sheet, `.appiconset` generator.
-- Finder Quick Action / Services menu.
-- Mac App Store build (sandbox + security-scoped bookmarks, fallback `~/Downloads/DropLab`).
-
-## 4. Bước tiếp theo
-- Bắt đầu **Phase 0 — Technical Spikes** khi có lệnh code. Mọi quyết định ở mục 0 đã chốt, không còn câu hỏi mở.
+### 🏝️ M9 — Khay Kéo-Ra ở Tai Thỏ (Notch Output Shelf) & Tiện ích Mở rộng (v2.0)
+- [ ] **Notch Output Drag-Out Shelf:**
+  - Sau khi chuyển đổi xong trong Lò Luyện Tai Thỏ, giữ icon file kết quả trên khay để bạn **kéo trực tiếp file mới từ Tai Thỏ thả thẳng vào khung chat Slack, Telegram, trình duyệt hoặc Xcode**.
+- [ ] **Finder Quick Action Extension:**
+  - Tích hợp vào menu chuột phải `Quick Actions` của Finder.
+- [ ] **iOS / iPadOS Companion (Phụ, tuỳ chọn):**
+  - Share/Action Extension + Shortcuts App Intents tái sử dụng `DropLabCore`.

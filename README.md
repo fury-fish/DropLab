@@ -104,7 +104,7 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 
 ## 🗺️ Roadmap / Lộ trình Phát triển
 
-> ✅ Plan locked (2026-10-21). Full plan with decisions, review notes & Definition of Done: **[ROADMAP.md](ROADMAP.md)**
+> 🎉 **Phase 1 (macOS v1.0.0) Completed!** Full Phase 2 plan (`M6 ➔ M9`): **[ROADMAP.md](ROADMAP.md)**
 
 * [x] UX/UI Concept & Conversion Matrix Architecture
 * [x] **Phase 0 (Spikes):** Validate global drag detection, non-activating `NSPanel` drop target, native audio/image conversion, non-sandboxed output
@@ -113,12 +113,15 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 * [x] **M3 (Notch Tray + Waveform Trimmer):** Drop into notch (top-center pill fallback) ➔ Trackpad scroll / arrow keys format picker + inline waveform trimmer with live audio preview ➔ export
 * [x] **M4 (Extended Codecs + Video/PDF Tools):** `MP3`/`WEBP`/`OGG`/`FLAC`/`WEBM` encoders, native `Video ➔ Animated GIF`, PDF Merge & Split
 * [x] **M5 (Release 1.0 macOS):** Signed `DropLab.app` v1.0.0 bundle with custom `AppIcon.icns`, `SMAppService` Launch at Login, Finder selection trigger, and Third-Party Licenses About panel
-* [ ] **M6 (iOS/iPadOS Companion — secondary, optional):** Share/Action Extension, App Intents, in-app drop zone, Live Activity progress
+* [ ] **M6 (UX Polish & Haptics — v1.1):** Center-hub & floating HUD preset callout (prevent Finder drag-thumbnail occlusion), Force Touch trackpad haptics, system-wide `⌥Space` hotkey
+* [ ] **M7 (Developer & Designer Tools — v1.2):** Xcode `.appiconset` generator, smart PDF compression, `SVG ➔ SwiftUI Shape` code generator, SpriteSheet packer
+* [ ] **M8 (On-Device Apple Silicon AI — v1.3):** 1-drop Background Removal (`Vision`), OCR Image/PDF ➔ `.txt`/`.md`, Audio/Video ➔ `.srt` subtitles (`Speech`)
+* [ ] **M9 (Notch Drag-Out Shelf & Extensions — v2.0):** Drag converted files straight out of the Notch into Slack/Xcode, Finder Quick Action extension, optional iOS/iPadOS companion
 
 ---
 
 ## 🤝 Feedback & Contributions / Đóng góp Ý kiến
 
-This project is in the **Plan Locked** stage — roadmap finalized, implementation starts with Phase 0.
+**DropLab v1.0.0 for macOS** is live and ready to build (`./scripts/build-app.sh`). Phase 2 (`M6 ➔ M9`) is now planned in [ROADMAP.md](ROADMAP.md).
 
 Which interaction style do you prefer: **Radial Orbit (Concept 1)** or **Notch Alchemy (Concept 2)**? Feel free to open an [Issue](https://github.com/fury-fish/DropLab/issues) or join the discussion!
