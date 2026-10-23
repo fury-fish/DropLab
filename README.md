@@ -76,14 +76,14 @@ Turn your device's hardware cutout into a tactile, fluid processing dock.
 
 Legend: **✅ Native** (Apple frameworks only) · **🧩 Extended** (bundled open-source codec, e.g. LAME / libwebp / ffmpeg-LGPL) · **🕒 Later** (backlog)
 
-| Category (Nhóm) | ✅ Native (M1–M2) | 🧩 Extended (M4) | 🕒 Later | Quick Modifiers (Tham số nhanh) |
+| Category (Nhóm) | ✅ Native & Local AI (M1–M9) | 🧩 Extended Codecs (M4) | 🕒 Planned iOS (M10–M12) | Quick Modifiers (Tham số nhanh) |
 | --- | --- | --- | --- | --- |
-| **🎵 Audio** | `wav`, `aiff`, `caf`, `m4a` (AAC/ALAC) ⟷ each other; decode `mp3`, `flac` | Encode `mp3`, `ogg`/`opus`, `flac` | ➔ `txt`/`srt` (speech-to-text) | `LEI16`, `24-bit`, `Mono`, `Trim (00:00-00:08)`, `Normalize` |
-| **🖼️ Raster Image** | `heic`, `png`, `jpg`, `tiff`, `gif` ⟷ each other; decode `webp`, `avif`; `png ➔ icns` | Encode `webp`, `avif`; `ico` | OCR ➔ `txt`, `.appiconset`, SpriteSheet | `Scale 1x/2x/3x`, `Quality 80%`, `Remove Alpha` |
-| **🎬 Video** | `mov` ⟷ `mp4` (`H.264/HEVC/ProRes`), extract audio ➔ `m4a`/`wav` | `webm`, `mkv`, `avi`, ➔ `gif`/`webp` animated | `png_seq` | `Trim`, `FPS 15/30/60`, `Mute Audio` |
-| **✒️ Vector** | `pdf` ➔ `png`/`jpg` | `svg` ➔ raster | `eps`, SVG ➔ SwiftUI `Shape` | `DPI 72/150/300`, `Custom Dimension` |
-| **📄 Document** | `pdf` pages ➔ image, merge/split PDF | — | `md` ⟷ `html` ⟷ `pdf` ⟷ `docx`, `epub` | `Merge`, `Split Pages`, `Compress PDF` |
-| **🧬 Data & Config** | `json` ⟷ `plist` (binary/XML), `csv` ⟷ `tsv` | `yaml` | ➔ Markdown/HTML table | `Minify`, `Prettify` |
+| **🎵 Audio** | `wav`, `aiff`, `caf`, `m4a` (AAC/ALAC) ⟷ each other; `srt` (Speech AI); decode `mp3`, `flac` | Encode `mp3`, `ogg`/`opus`, `flac` | iOS Share Sheet Audio Converter | `LEI16`, `24-bit`, `Mono`, `Trim (00:00-00:08)`, `ALAC` |
+| **🖼️ Raster Image** | `heic`, `png`, `jpg`, `tiff`, `gif` ⟷ each other; decode `webp`, `avif`; `icns`, `.appiconset`, `SpriteSheet`, `txt` (OCR), Tách nền AI | Encode `webp`, `avif`; `ico` | Photos/Files Action Extension | `Scale 0.5x/2x`, `Quality 80%`, `No Alpha`, `Tách nền AI`, `SpriteSheet` |
+| **🎬 Video** | `mov` ⟷ `mp4` (`H.264/HEVC/ProRes`), extract audio ➔ `m4a`/`wav`, `srt` phụ đề AI | `webm`, `mkv`, `avi`, ➔ `gif`/`webp` animated | iOS Video Compressor | `Trim`, `FPS 15`, `Mute Audio` |
+| **✒️ Vector** | `pdf` ➔ `png`/`jpg`, `svg` ➔ SwiftUI `Shape` (`.swift`) | `svg` ➔ raster | — | `SwiftUI Shape Struct + #Preview` |
+| **📄 Document** | `pdf` pages ➔ image, merge/split PDF, nén PDF (`Compress PDF`), OCR ➔ `txt` | — | iOS QuickLook Preview | `Merge`, `Split Pages`, `Compress PDF` |
+| **🧬 Data & Config** | `json` ⟷ `plist` (binary/XML), `csv` ⟷ `tsv` | `yaml` | Shortcuts App Intents | `Minify`, `Prettify`, `Binary`, `XML` |
 
 ---
 
@@ -97,6 +97,7 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 * **Audio Engine:** `AudioToolbox` (`ExtAudioFile`), `AVAssetReader`/`AVAssetWriter` (native replacement for `afconvert` & `ffmpeg` trimming).
 * **Image Engine:** `ImageIO` (`CGImageSource` / `CGImageDestination`) & `CoreGraphics`.
 * **Video Engine:** `AVFoundation` (`AVAssetExportSession`) & `VideoToolbox`.
+* **On-Device Apple Silicon AI:** `Vision` (`VNGenerateForegroundInstanceMaskRequest`, `VNRecognizeTextRequest`, `VNDetectContoursRequest`) & `Speech` (`SFSpeechRecognizer`).
 * **Extended Codecs (optional):** LAME (`mp3`), libwebp (`webp`), libopus/libvorbis, ffmpeg (LGPL build) for `webm`/`mkv`.
 * **Distribution:** Developer ID + Notarization (non-sandboxed, so output can be written next to the source file).
 
@@ -117,11 +118,12 @@ Native-first for Apple Silicon to keep RAM overhead low and startup instant. For
 * [x] **M7 (Developer & Designer Tools — v1.2):** Xcode `.appiconset` generator, smart PDF compression, `SVG ➔ SwiftUI Shape` code generator, SpriteSheet packer (`.png` + `.json` atlas)
 * [x] **M8 (On-Device Apple Silicon AI — v1.3):** 1-drop Background Removal (`Vision`), OCR Image/PDF ➔ `.txt`, Audio/Video ➔ `.srt` subtitles (`Speech`)
 * [x] **M9 (Notch Drag-Out Shelf & Finder Integration — v2.0):** Drag converted files straight out of the Notch into Slack/Xcode, Finder "Open With" & macOS System Services integration
+* [ ] **Phase 3 (iOS & iPadOS Companion — M10 ➔ M12):** Cross-platform `DropLabCore` (iOS 17+), Share/Action Extension in Files & Photos, Shortcuts App Intents, Dynamic Island Live Activity
 
 ---
 
 ## 🤝 Feedback & Contributions / Đóng góp Ý kiến
 
-**DropLab v1.0.0 for macOS** is live and ready to build (`./scripts/build-app.sh`). Phase 2 (`M6 ➔ M9`) is now planned in [ROADMAP.md](ROADMAP.md).
+**DropLab v2.0.0 for macOS** is live and ready to build (`./scripts/build-app.sh`). Phase 3 (iOS & iPadOS Companion) is planned in [ROADMAP.md](ROADMAP.md).
 
 Which interaction style do you prefer: **Radial Orbit (Concept 1)** or **Notch Alchemy (Concept 2)**? Feel free to open an [Issue](https://github.com/fury-fish/DropLab/issues) or join the discussion!
